@@ -279,6 +279,25 @@ body {
   box-shadow: 0 6px 18px rgba(26, 31, 38, 0.12);
 }
 
+/* 개발 중 등 링크 비활성 카드 — 흐린 회색, hover 반응 없음 */
+.project-card--disabled {
+  cursor: default;
+}
+
+.project-card--disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow);
+}
+
+.project-card--disabled .project-card__header,
+.project-card--disabled .project-card__footer {
+  background: #eceef0;
+}
+
+.project-card--disabled .project-card__action {
+  color: var(--muted);
+}
+
 .project-card__header {
   display: flex;
   flex-direction: column;
@@ -298,7 +317,8 @@ body {
 
 .project-card__header--thumbnail .faq-thumbnail,
 .project-card__header--thumbnail .admin-thumbnail,
-.project-card__header--thumbnail .lotto-thumbnail {
+.project-card__header--thumbnail .lotto-thumbnail,
+.project-card__header--thumbnail .agentic-thumbnail {
   margin-bottom: 0.5rem;
 }
 
@@ -390,6 +410,11 @@ body {
   color: var(--badge-text);
   font-size: 0.7rem;
   font-weight: 600;
+}
+
+.project-card__badge--live {
+  background: #e3f9d3;
+  color: #3f7d20;
 }
 
 .project-card__summary {
@@ -569,6 +594,22 @@ body {
   color: var(--icon-rose-ink);
 }
 
+/* agentic-rag 카드 전용 — 개발 중 플레이스홀더 (점선 박스) */
+.agentic-thumbnail {
+  height: 140px;
+  border-radius: 6px;
+  border: 1.5px dashed #c7cad0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agentic-thumbnail__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9aa0a8;
+}
+
 .project-card__footer {
   display: flex;
   align-items: center;
@@ -580,6 +621,14 @@ body {
 
 .project-card__footer:hover {
   background: #fafbfc;
+}
+
+.project-card--disabled .project-card__footer:hover {
+  background: #eceef0;
+}
+
+.project-card--disabled .project-card__footer:hover .project-card__action {
+  color: var(--muted);
 }
 
 .project-card__action {

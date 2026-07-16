@@ -11,10 +11,16 @@ type ProjectCardProps = {
  */
 export function ProjectCard({ card }: ProjectCardProps) {
   return (
-    <a className="project-card" href={card.href} target="_blank" rel="noopener noreferrer">
+    <a
+      className={card.disabled ? 'project-card project-card--disabled' : 'project-card'}
+      {...(card.disabled ? {} : { href: card.href, target: '_blank', rel: 'noopener noreferrer' })}
+    >
       <div
         className={
-          card.id === 'faq-chatbot' || card.id === 'chatbot-admin' || card.id === 'lotto-insight'
+          card.id === 'faq-chatbot' ||
+          card.id === 'chatbot-admin' ||
+          card.id === 'lotto-insight' ||
+          card.id === 'agentic-rag'
             ? 'project-card__header project-card__header--thumbnail'
             : 'project-card__header'
         }
@@ -40,7 +46,12 @@ export function ProjectCard({ card }: ProjectCardProps) {
 
         <ul className="project-card__badges">
           {card.badges.map((badge) => (
-            <li key={badge} className="project-card__badge">
+            <li
+              key={badge}
+              className={
+                badge === 'Live' ? 'project-card__badge project-card__badge--live' : 'project-card__badge'
+              }
+            >
               {badge}
             </li>
           ))}
@@ -49,6 +60,7 @@ export function ProjectCard({ card }: ProjectCardProps) {
         {card.id === 'faq-chatbot' && <FaqChatbotThumbnail />}
         {card.id === 'chatbot-admin' && <ChatbotAdminThumbnail />}
         {card.id === 'lotto-insight' && <LottoInsightThumbnail />}
+        {card.id === 'agentic-rag' && <AgenticRagThumbnail />}
         {card.section === 'docs' && <DocThumbnail />}
         {card.section === 'profile' && <ProfileThumbnail />}
 
@@ -64,6 +76,15 @@ export function ProjectCard({ card }: ProjectCardProps) {
 }
 
 /** 문서/페이지 아이콘 — 접힌 모서리 + 텍스트 줄, DocThumbnail·ProfileThumbnail 공용 */
+/** agentic-rag 카드 전용 — 개발 중 플레이스홀더 (점선 박스 + 라벨) */
+function AgenticRagThumbnail() {
+  return (
+    <div className="agentic-thumbnail" aria-hidden="true">
+      <span className="agentic-thumbnail__label">개발 중</span>
+    </div>
+  )
+}
+
 function DocPageIcon() {
   return (
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">

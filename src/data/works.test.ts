@@ -13,6 +13,7 @@ describe('WORK_CARDS 스키마', () => {
     expect(WORK_CARDS.map((card) => card.id)).toEqual([
       'faq-chatbot',
       'chatbot-admin',
+      'agentic-rag',
       'lotto-insight',
       'chatbot-manual',
       'budget-guide',
@@ -80,7 +81,7 @@ describe('resolveHubUrls', () => {
     const resolved = resolveHubUrls(WORK_CARDS, '167.233.211.67')
     expect(resolved[0].href).toBe('http://167.233.211.67:3001')
     expect(resolved[1].href).toBe('http://167.233.211.67:3002')
-    expect(resolved[2].href).toBe('https://lotto-insight-pied.vercel.app')
+    expect(resolved[3].href).toBe('https://lotto-insight-pied.vercel.app')
   })
 
   it('hostname이 비면 에러', () => {

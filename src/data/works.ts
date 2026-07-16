@@ -13,14 +13,16 @@ export type WorkCard = {
   href: string
   /** 카드가 속한 섹션 — 미지정 시 'projects' */
   section?: 'projects' | 'docs' | 'profile' | 'works'
+  /** true면 링크 비활성화(개발 중 등) — href는 무시되고 카드는 흐리게 표시 */
+  disabled?: boolean
 }
 
 /** 빌드 시 호스트 없이도 동작하는 정적 카드 정의 */
 export const WORK_CARDS: WorkCard[] = [
   {
     id: 'faq-chatbot',
-    title: 'faq-chatbot',
-    summary: 'FAQ + Chroma 검색 챗봇 UI',
+    title: 'chatbot-ui',
+    summary: 'FAQ → Chroma → LLM 검색 쳇봇 UI',
     badges: ['Owner', 'Live'],
     actionLabel: 'OPEN APP',
     href: 'http://167.233.211.67:3001',
@@ -28,23 +30,32 @@ export const WORK_CARDS: WorkCard[] = [
   {
     id: 'chatbot-admin',
     title: 'chatbot-admin',
-    summary: 'FAQ·모니터링 관리자 콘솔',
+    summary: '품질관리 및 실시간 모니터링',
     badges: ['Owner', 'Live'],
     actionLabel: 'OPEN APP',
     href: 'http://167.233.211.67:3002',
   },
   {
+    id: 'agentic-rag',
+    title: 'LangGraph-Agentic RAG',
+    summary: '로드 → 청킹 → 벡터화 → LLM 판단 Agentic',
+    badges: ['Owner', 'In Progress'],
+    actionLabel: 'COMING SOON',
+    href: '#',
+    disabled: true,
+  },
+  {
     id: 'lotto-insight',
     title: 'lotto-insight',
-    summary: '로또 용지·분석 인터랙티브',
+    summary: '심심풀이, 패턴으로 보는 로또',
     badges: ['Owner', 'Live'],
     actionLabel: 'OPEN APP',
     href: 'https://lotto-insight-pied.vercel.app',
   },
   {
     id: 'chatbot-manual',
-    title: 'chatbot-manual',
-    summary: '챗봇 사용 가이드 문서',
+    title: 'chatbot-개발가이드',
+    summary: '쳇봇 개발 계획서',
     badges: ['Guide'],
     actionLabel: 'VIEW MANUAL',
     href: '/chatbot_guide.html',
@@ -61,7 +72,7 @@ export const WORK_CARDS: WorkCard[] = [
   },
   {
     id: 'self-introduction',
-    title: 'self-introduction',
+    title: '자기소개서',
     summary: '경력 자기소개서 (PDF)',
     badges: ['PDF'],
     actionLabel: 'VIEW PDF',
