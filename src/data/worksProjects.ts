@@ -25,9 +25,9 @@ export const WORKS_PROJECTS: WorksProject[] = [
     changelogFile: 'chatbot-rag_CHANGELOG.md',
   },
   {
-    id: 'regline-hub-portal',
-    title: 'regline-hub (포트폴리오 포털)',
-    summary: '이 포털 자체의 계획·배포·운영 변경 기록',
+    id: 'works-placeholder-01',
+    title: 'CHANGELOG',
+    summary: 'regline-hub 포털 변경 이력 (GitHub)',
     badges: ['Live'],
     tabs: ['ops'],
     changelogFile: 'regline-hub_CHANGELOG.md',

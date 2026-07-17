@@ -1,20 +1,26 @@
-/** CHANGELOG.md 섹션 → Works 운영로그 항목 */
+/** CHANGELOG.md 섹션 → Works 운영로그 한 줄 (폴백·레거시) */
 export type ChangelogOpsEntry = {
   date: string
   text: string
 }
 
+/** CHANGELOG.md 날짜 섹션 본문 */
+export type ChangelogSection = {
+  id: string
+  dateLabel: string
+  lines: string[]
+}
+
 /**
  * `## YYYY-MM-DD (vN)` + `**변경 내용**:` 한 줄만 추출한다.
- * 상세 불릿은 MVP에서 무시.
+ * 폴백 stub 목록용.
  */
 export function parseChangelogMarkdown(markdown: string): ChangelogOpsEntry[] {
   const entries: ChangelogOpsEntry[] = []
-  // 섹션 헤딩으로 분할 (첫 fragment는 서문)
   const sections = markdown.split(/^## /m).slice(1)
 
   for (const section of sections) {
-    const headingMatch = section.match(/^(\d{4})-(\d{2})-(\d{2})\s*\(v\d+\)/)
+    const headingMatch = section.match(/^(\d{4})-(\d{2})-(\d{2})\s*\(v(\d+)\)/)
     if (!headingMatch) continue
 
     const date = `${headingMatch[1]}${headingMatch[2]}${headingMatch[3]}`
@@ -30,6 +36,34 @@ export function parseChangelogMarkdown(markdown: string): ChangelogOpsEntry[] {
   return entries
 }
 
+/** `## 날짜 (vN)` 섹션별 본문 줄 — 운영로그 화면에 CHANGELOG 그대로 표시 */
+export function parseChangelogSections(markdown: string): ChangelogSection[] {
+  const sections: ChangelogSection[] = []
+  const parts = markdown.split(/^## /m).slice(1)
+
+  for (const part of parts) {
+    const headingMatch = part.match(/^(\d{4}-\d{2}-\d{2})\s*\(v(\d+)\)/)
+    if (!headingMatch) continue
+
+    const dateLabel = `${headingMatch[1]} (v${headingMatch[2]})`
+    const body = part.slice(headingMatch[0].length)
+    const lines = body
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && line !== '---')
+
+    if (lines.length === 0) continue
+
+    sections.push({
+      id: `${headingMatch[1]}-v${headingMatch[2]}`,
+      dateLabel,
+      lines,
+    })
+  }
+
+  return sections
+}
+
 /** GitHub Raw — 인증 없이 공개 파일 조회 */
 const CHANGELOG_RAW_BASE =
   'https://raw.githubusercontent.com/regline-dev/CHANGELOG/main/'
@@ -39,14 +73,30 @@ export function changelogRawUrl(file: string): string {
   return `${CHANGELOG_RAW_BASE}${file}`
 }
 
-export async function fetchChangelogOps(
+export async function fetchChangelogMarkdown(
   url: string,
   fetchImpl: typeof fetch = fetch,
-): Promise<ChangelogOpsEntry[]> {
+): Promise<string> {
   const response = await fetchImpl(url)
   if (!response.ok) {
     throw new Error(`CHANGELOG 조회 실패: HTTP ${response.status}`)
   }
-  const markdown = await response.text()
+  return response.text()
+}
+
+export async function fetchChangelogSections(
+  url: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<ChangelogSection[]> {
+  const markdown = await fetchChangelogMarkdown(url, fetchImpl)
+  return parseChangelogSections(markdown)
+}
+
+/** @deprecated 폴백용 — fetchChangelogSections 사용 권장 */
+export async function fetchChangelogOps(
+  url: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<ChangelogOpsEntry[]> {
+  const markdown = await fetchChangelogMarkdown(url, fetchImpl)
   return parseChangelogMarkdown(markdown)
 }

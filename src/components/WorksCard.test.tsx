@@ -13,9 +13,9 @@ const tabbedProject: WorksProject = {
 }
 
 const opsOnlyProject: WorksProject = {
-  id: 'regline-hub-portal',
-  title: 'regline-hub (포트폴리오 포털)',
-  summary: '포털 자체의 변경 기록',
+  id: 'works-placeholder-01',
+  title: 'CHANGELOG',
+  summary: 'regline-hub 포털 변경 이력',
   badges: ['Live'],
   tabs: ['ops'],
   changelogFile: 'regline-hub_CHANGELOG.md',

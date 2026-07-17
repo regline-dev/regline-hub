@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseChangelogMarkdown } from './parseChangelog'
+import { parseChangelogMarkdown, parseChangelogSections } from './parseChangelog'
 
 const sample = `# regline-hub CHANGELOG
 
@@ -11,7 +11,8 @@ const sample = `# regline-hub CHANGELOG
 
 **변경 내용**: CHANGELOG → Works 연동 계획 확정
 
-- 상세 줄은 무시
+- 화면: Works → 챗봇/RAG → 운영로그
+- push만으로 반영
 
 ---
 
@@ -35,5 +36,19 @@ describe('parseChangelogMarkdown', () => {
 
   it('섹션이 없으면 빈 배열을 반환한다', () => {
     expect(parseChangelogMarkdown('# title only\n')).toEqual([])
+  })
+})
+
+describe('parseChangelogSections', () => {
+  it('날짜 섹션 본문 전체를 반환한다', () => {
+    const sections = parseChangelogSections(sample)
+    expect(sections).toHaveLength(2)
+    expect(sections[0].dateLabel).toBe('2026-07-17 (v2)')
+    expect(sections[0].lines).toEqual([
+      '**변경 파일**: Docs/foo.md',
+      '**변경 내용**: CHANGELOG → Works 연동 계획 확정',
+      '- 화면: Works → 챗봇/RAG → 운영로그',
+      '- push만으로 반영',
+    ])
   })
 })

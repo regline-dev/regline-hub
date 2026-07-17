@@ -68,7 +68,7 @@ describe('WORKS_PROJECTS 스키마', () => {
     expect(() => assertWorksProjectsReady(WORKS_PROJECTS)).not.toThrow()
     expect(WORKS_PROJECTS.map((p) => p.title)).toEqual([
       '챗봇/RAG 프로젝트',
-      'regline-hub (포트폴리오 포털)',
+      'CHANGELOG',
       '다른 프로젝트 02',
     ])
     expect(WORKS_PROJECTS[0].tabs).toEqual(['status', 'ops'])
