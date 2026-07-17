@@ -73,15 +73,13 @@ export function changelogRawUrl(file: string): string {
   return `${CHANGELOG_RAW_BASE}${file}`
 }
 
+import { fetchRawText } from './fetchRawText'
+
 export async function fetchChangelogMarkdown(
   url: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<string> {
-  const response = await fetchImpl(url)
-  if (!response.ok) {
-    throw new Error(`CHANGELOG 조회 실패: HTTP ${response.status}`)
-  }
-  return response.text()
+  return fetchRawText(url, fetchImpl)
 }
 
 export async function fetchChangelogSections(

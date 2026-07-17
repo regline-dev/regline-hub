@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactElement } from 'react'
 import { LinksPanel } from './components/LinksPanel'
 import { ProjectCard } from './components/ProjectCard'
 import { WorksCard } from './components/WorksCard'
-import { WorksDetail } from './components/WorksDetail'
+import { WorksPanel } from './components/WorksPanel'
 import { LINK_ITEMS } from './data/links'
 import type { WorkCard } from './data/works'
 import { WORKS_PROJECTS, type WorksTabId } from './data/worksProjects'
@@ -231,16 +231,6 @@ function WorksView({
   detail: { projectId: string; tab: WorksTabId } | null
   setDetail: (value: { projectId: string; tab: WorksTabId } | null) => void
 }) {
-  if (detail) {
-    return (
-      <WorksDetail
-        projectId={detail.projectId}
-        tab={detail.tab}
-        onBack={() => setDetail(null)}
-      />
-    )
-  }
-
   return (
     <>
       <div className="shell__main-head">
@@ -250,15 +240,31 @@ function WorksView({
         </p>
       </div>
 
-      <section className="shell__grid shell__grid--works" aria-label="진행 중 작업 목록">
-        {WORKS_PROJECTS.map((project) => (
-          <WorksCard
-            key={project.id}
-            project={project}
-            onSelectTab={(projectId, tab) => setDetail({ projectId, tab })}
-          />
-        ))}
-      </section>
+      <div className="works-split">
+        <section className="works-split__cards" aria-label="진행 중 작업 목록">
+          {WORKS_PROJECTS.map((project) => (
+            <WorksCard
+              key={project.id}
+              project={project}
+              onSelectTab={(projectId, tab) => setDetail({ projectId, tab })}
+            />
+          ))}
+        </section>
+
+        <aside className="works-split__panel" aria-label="Works 상세 패널">
+          {detail ? (
+            <WorksPanel
+              projectId={detail.projectId}
+              tab={detail.tab}
+              onClear={() => setDetail(null)}
+            />
+          ) : (
+            <p className="works-split__empty">
+              카드에서 <strong>진행현황</strong> 또는 <strong>운영로그</strong>를 선택하세요.
+            </p>
+          )}
+        </aside>
+      </div>
     </>
   )
 }

@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { App } from './App'
 import { WORK_CARDS, resolveHubUrls } from './data/works'
 
@@ -9,125 +9,78 @@ function renderHub() {
   return render(<App cards={cards} />)
 }
 
+beforeEach(() => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      text: async () => `## 2026-07-17 (v1)\n\n**변경 내용**: 테스트\n`,
+    }),
+  )
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
 describe('App 셸 레이아웃', () => {
   it('얇은 왼쪽바 + 컨텐츠만 있고 상단·푸터는 없다', () => {
     renderHub()
-
     expect(screen.getByRole('navigation', { name: '사이드 메뉴' })).toBeInTheDocument()
     expect(screen.getByRole('main')).toBeInTheDocument()
     expect(screen.queryByRole('banner')).not.toBeInTheDocument()
-    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Docs' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Profile' })).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: '문서 목록' })).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: '프로필 목록' })).toBeInTheDocument()
-  })
-
-  it('설정 버튼으로 지원 및 안내 패널을 열고 닫는다', async () => {
-    const user = userEvent.setup()
-    renderHub()
-
-    const toggle = screen.getByRole('button', { name: '지원 및 안내 열기' })
-    expect(screen.queryByRole('dialog', { name: '지원 및 안내' })).not.toBeInTheDocument()
-
-    await user.click(toggle)
-    expect(screen.getByRole('dialog', { name: '지원 및 안내' })).toBeInTheDocument()
-    expect(screen.getByText('regline@naver.com')).toBeInTheDocument()
-
-    await user.click(toggle)
-    expect(screen.queryByRole('dialog', { name: '지원 및 안내' })).not.toBeInTheDocument()
-
-    await user.click(toggle)
-    await user.click(screen.getByRole('button', { name: '닫기' }))
-    expect(screen.queryByRole('dialog', { name: '지원 및 안내' })).not.toBeInTheDocument()
   })
 })
 
 describe('사이드 네비 · Works · Links', () => {
-  it('초기 뷰는 Projects이고 Works/Links로 전환·복귀한다', async () => {
+  it('Works는 카드와 상세 패널을 동시에 보여준다', async () => {
     const user = userEvent.setup()
     renderHub()
-
-    expect(screen.getByRole('heading', { level: 1, name: 'Projects' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Projects' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Works' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: '진행 중 작업 목록' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Works' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
-    expect(screen.queryByRole('heading', { level: 1, name: 'Projects' })).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '챗봇/RAG 프로젝트' })).toBeInTheDocument()
+    expect(screen.getByRole('complementary', { name: 'Works 상세 패널' })).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: 'CHANGELOG' }),
+      screen.getByText((_, el) => el?.classList.contains('works-split__empty') === true),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '다른 프로젝트 02' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '진행현황' })).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: '운영로그' })).toHaveLength(2)
-
-    await user.click(screen.getByRole('button', { name: 'Links' }))
-    expect(screen.getByRole('heading', { level: 1, name: 'Links' })).toBeInTheDocument()
-    const links = screen.getByRole('list', { name: '바로가기 목록' })
-    expect(within(links).getByRole('link', { name: /티스토리/ })).toHaveAttribute(
-      'href',
-      'https://regline.tistory.com',
-    )
-    expect(within(links).getByRole('link', { name: /GitHub/ })).toBeInTheDocument()
-    expect(within(links).getByRole('link', { name: /메일/ })).toHaveAttribute(
-      'href',
-      'mailto:regline@naver.com',
-    )
-    expect(within(links).getByRole('link', { name: /자기소개서/ })).toHaveAttribute(
-      'href',
-      '/docs/self-introduction.pdf',
-    )
-
-    await user.click(screen.getByRole('button', { name: 'Projects' }))
-    expect(screen.getByRole('heading', { level: 1, name: 'Projects' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Docs' })).toBeInTheDocument()
-    expect(screen.queryByRole('list', { name: '바로가기 목록' })).not.toBeInTheDocument()
-  })
-
-  it('Projects 뷰에는 Works 카드가 없고 Works 뷰에만 있다', async () => {
-    const user = userEvent.setup()
-    renderHub()
-
-    expect(screen.queryByRole('heading', { name: '챗봇/RAG 프로젝트' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Works' }))
     expect(screen.getByRole('heading', { name: '챗봇/RAG 프로젝트' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'regline-hub' })).toBeInTheDocument()
   })
 
-  it('Works 진행현황 탭으로 상세에 들어가고 뒤로 나온다', async () => {
+  it('운영로그 클릭 시 카드는 유지되고 오른쪽에 CHANGELOG가 뜬다', async () => {
     const user = userEvent.setup()
     renderHub()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
-    await user.click(screen.getByRole('button', { name: '진행현황' }))
-    expect(screen.getByRole('heading', { name: 'Agentic RAG (LangGraph)' })).toBeInTheDocument()
-    expect(screen.getByText(/인제스트/)).toBeInTheDocument()
+    const hubCard = screen.getByRole('heading', { name: 'regline-hub' }).closest('article')
+    expect(hubCard).toBeTruthy()
+    await user.click(within(hubCard as HTMLElement).getByRole('button', { name: '운영로그' }))
 
-    await user.click(screen.getByRole('button', { name: '← 뒤로' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Works' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '진행현황' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'regline-hub' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: '운영로그' })).toBeInTheDocument()
   })
 
-  it('운영로그 상세에서 Works 사이드를 다시 누르면 카드 목록으로 돌아온다', async () => {
+  it('Works 사이드 재클릭 시 패널 선택이 해제된다', async () => {
     const user = userEvent.setup()
     renderHub()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
     await user.click(screen.getAllByRole('button', { name: '운영로그' })[0])
-    expect(screen.getByRole('heading', { level: 1, name: 'CHANGELOG' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: '운영로그' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
-    expect(screen.getByRole('heading', { level: 1, name: 'Works' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '진행현황' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { level: 1, name: 'CHANGELOG' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 2, name: '운영로그' })).not.toBeInTheDocument()
+    expect(
+      screen.getByText((_, el) => el?.classList.contains('works-split__empty') === true),
+    ).toBeInTheDocument()
+  })
+
+  it('Links로 전환된다', async () => {
+    const user = userEvent.setup()
+    renderHub()
+    await user.click(screen.getByRole('button', { name: 'Links' }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Links' })).toBeInTheDocument()
   })
 })

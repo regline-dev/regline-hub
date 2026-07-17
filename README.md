@@ -13,12 +13,17 @@
 | Works | 진행 중 / 기록용 카드 |
 | Links | 외부 링크·연락 |
 
-## Works 운영로그
+## Works
 
-**Works → 챗봇/RAG 프로젝트 → 운영로그** 목록은 코드에 고정하지 않고  
-[regline-dev/CHANGELOG](https://github.com/regline-dev/CHANGELOG)의 `regline-hub_CHANGELOG.md`를 읽습니다.
+왼쪽 카드 / 오른쪽 패널(50:50).
 
-CHANGELOG 레포에 push하면 이 hub를 재배포하지 않아도 운영로그가 갱신됩니다.
+| 탭 | 내용 |
+|----|------|
+| 진행현황 | 각 프로젝트 GitHub README |
+| 운영로그 | [CHANGELOG](https://github.com/regline-dev/CHANGELOG) 레포의 `{프로젝트}_CHANGELOG.md` |
+
+카드 예: `챗봇/RAG 프로젝트`, `regline-hub`
+
 
 ## 개발
 

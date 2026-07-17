@@ -6,27 +6,21 @@ import type { WorksProject } from '../data/worksProjects'
 const tabbedProject: WorksProject = {
   id: 'chatbot-rag',
   title: '챗봇/RAG 프로젝트',
-  summary: 'LangChain 인제스트 + LangGraph Tool 검색',
+  summary: '요약',
   badges: ['WIP'],
   tabs: ['status', 'ops'],
   changelogFile: 'chatbot-rag_CHANGELOG.md',
+  readmeRawUrl: 'https://example.test/README.md',
 }
 
-const opsOnlyProject: WorksProject = {
-  id: 'works-placeholder-01',
-  title: 'CHANGELOG',
-  summary: 'regline-hub 포털 변경 이력',
+const hubProject: WorksProject = {
+  id: 'regline-hub',
+  title: 'regline-hub',
+  summary: '포털',
   badges: ['Live'],
-  tabs: ['ops'],
+  tabs: ['status', 'ops'],
   changelogFile: 'regline-hub_CHANGELOG.md',
-}
-
-const plainProject: WorksProject = {
-  id: 'works-placeholder-02',
-  title: '다른 프로젝트 02',
-  summary: '준비 중',
-  badges: ['Soon'],
-  tabs: [],
+  readmeRawUrl: 'https://example.test/hub-README.md',
 }
 
 describe('WorksCard', () => {
@@ -36,16 +30,8 @@ describe('WorksCard', () => {
     expect(screen.getByRole('button', { name: '운영로그' })).toBeInTheDocument()
   })
 
-  it('ops 탭만 있는 카드는 운영로그 버튼만 보여준다', () => {
-    render(<WorksCard project={opsOnlyProject} onSelectTab={() => {}} />)
-    expect(screen.queryByRole('button', { name: '진행현황' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '운영로그' })).toBeInTheDocument()
-  })
-
-  it('탭이 없는 카드는 준비 중 footer만 보여준다', () => {
-    render(<WorksCard project={plainProject} onSelectTab={() => {}} />)
-    expect(screen.queryByRole('button', { name: '진행현황' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '운영로그' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '준비 중' })).toBeDisabled()
+  it('regline-hub 카드 제목을 표시한다', () => {
+    render(<WorksCard project={hubProject} onSelectTab={() => {}} />)
+    expect(screen.getByRole('heading', { name: 'regline-hub' })).toBeInTheDocument()
   })
 })

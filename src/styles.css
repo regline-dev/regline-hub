@@ -786,6 +786,137 @@ body {
   align-items: stretch;
 }
 
+/* Works 50:50 — 왼쪽 카드 / 오른쪽 패널 */
+.works-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  min-height: 28rem;
+}
+
+.works-split__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+.works-split__panel {
+  position: sticky;
+  top: 1rem;
+  min-height: 24rem;
+  max-height: calc(100vh - 6rem);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fafafa;
+  padding: 1rem;
+}
+
+.works-split__empty {
+  margin: 2rem 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.works-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.works-panel__clear {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+.works-panel__clear:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.works-panel__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.works-panel__subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.works-panel__scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.readme-view {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.readme-view__h1 {
+  margin: 0.4rem 0 0.2rem;
+  font-size: 1.15rem;
+}
+
+.readme-view__h2 {
+  margin: 0.5rem 0 0.2rem;
+  font-size: 1.02rem;
+}
+
+.readme-view__h3 {
+  margin: 0.35rem 0 0.15rem;
+  font-size: 0.95rem;
+}
+
+.readme-view__p,
+.readme-view__table-row {
+  margin: 0;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
+.readme-view__li {
+  margin-left: 1.1rem;
+  color: var(--muted);
+}
+
+.readme-view__quote {
+  margin: 0.25rem 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+
+.readme-view__gap {
+  height: 0.35rem;
+}
+
+@media (max-width: 900px) {
+  .works-split {
+    grid-template-columns: 1fr;
+  }
+
+  .works-split__panel {
+    position: static;
+    max-height: none;
+  }
+}
+
 .works-card {
   display: flex;
   flex-direction: column;
