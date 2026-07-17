@@ -26,11 +26,11 @@ describe('WorksPanel', () => {
     vi.unstubAllGlobals()
   })
 
-  it('운영로그 탭에 CHANGELOG 섹션을 표시한다', async () => {
+  it('CHANGELOG.md 탭에 CHANGELOG 섹션을 표시한다', async () => {
     render(<WorksPanel projectId="regline-hub" tab="ops" />)
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'regline-hub 운영로그' }),
+      screen.getByRole('heading', { level: 2, name: 'regline-hub CHANGELOG.md' }),
     ).toBeInTheDocument()
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: '2026-07-17 (v2)' })).toBeInTheDocument()
@@ -38,11 +38,11 @@ describe('WorksPanel', () => {
     expect(screen.getByText(/스플릿 패널/)).toBeInTheDocument()
   })
 
-  it('진행현황 탭에 README를 표시한다', async () => {
+  it('README.md 탭에 README를 표시한다', async () => {
     render(<WorksPanel projectId="regline-hub" tab="status" />)
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'regline-hub 진행현황' }),
+      screen.getByRole('heading', { level: 2, name: 'regline-hub README.md' }),
     ).toBeInTheDocument()
     await waitFor(() => {
       expect(screen.getByText(/포트폴리오 포털/)).toBeInTheDocument()

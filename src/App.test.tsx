@@ -50,19 +50,19 @@ describe('사이드 네비 · Works · Links', () => {
     expect(screen.getByRole('heading', { name: '다른 프로젝트 03' })).toBeInTheDocument()
   })
 
-  it('운영로그 클릭 시 카드는 유지되고 오른쪽에 CHANGELOG가 뜬다', async () => {
+  it('CHANGELOG.md 클릭 시 카드는 유지되고 오른쪽에 CHANGELOG가 뜬다', async () => {
     const user = userEvent.setup()
     renderHub()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
     const hubCard = screen.getByRole('heading', { name: 'regline-hub' }).closest('article')
     expect(hubCard).toBeTruthy()
-    await user.click(within(hubCard as HTMLElement).getByRole('button', { name: '운영로그' }))
+    await user.click(within(hubCard as HTMLElement).getByRole('button', { name: 'CHANGELOG.md' }))
 
     expect(screen.getByRole('heading', { level: 1, name: 'Works' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'regline-hub' })).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { level: 2, name: 'regline-hub 운영로그' }),
+      screen.getByRole('heading', { level: 2, name: 'regline-hub CHANGELOG.md' }),
     ).toBeInTheDocument()
   })
 
@@ -71,14 +71,15 @@ describe('사이드 네비 · Works · Links', () => {
     renderHub()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
-    await user.click(screen.getAllByRole('button', { name: '운영로그' })[0])
+    const hubCard = screen.getByRole('heading', { name: 'regline-hub' }).closest('article')
+    await user.click(within(hubCard as HTMLElement).getByRole('button', { name: 'CHANGELOG.md' }))
     expect(
-      screen.getByRole('heading', { level: 2, name: 'regline-hub 운영로그' }),
+      screen.getByRole('heading', { level: 2, name: 'regline-hub CHANGELOG.md' }),
     ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
     expect(
-      screen.queryByRole('heading', { level: 2, name: 'regline-hub 운영로그' }),
+      screen.queryByRole('heading', { level: 2, name: 'regline-hub CHANGELOG.md' }),
     ).not.toBeInTheDocument()
     expect(
       screen.getByText((_, el) => el?.classList.contains('works-split__empty') === true),

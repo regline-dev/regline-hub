@@ -4,12 +4,12 @@ import { WorksCard } from './WorksCard'
 import type { WorksProject } from '../data/worksProjects'
 
 const tabbedProject: WorksProject = {
-  id: 'chatbot-rag',
-  title: '챗봇/RAG 프로젝트',
+  id: 'langgraph-agentic-backend',
+  title: 'LangGraph-Agentic',
   summary: '요약',
   badges: ['WIP'],
   tabs: ['status', 'ops'],
-  changelogFile: 'chatbot-rag_CHANGELOG.md',
+  changelogRawUrl: 'https://example.test/CHANGELOG.md',
   readmeRawUrl: 'https://example.test/README.md',
 }
 
@@ -19,15 +19,15 @@ const hubProject: WorksProject = {
   summary: '포털',
   badges: ['Live'],
   tabs: ['status', 'ops'],
-  changelogFile: 'regline-hub_CHANGELOG.md',
+  changelogRawUrl: 'https://example.test/hub-CHANGELOG.md',
   readmeRawUrl: 'https://example.test/hub-README.md',
 }
 
 describe('WorksCard', () => {
-  it('탭이 있는 카드에 진행현황·운영로그 버튼을 보여준다', () => {
+  it('탭이 있는 카드에 README.md·CHANGELOG.md 버튼을 보여준다', () => {
     render(<WorksCard project={tabbedProject} onSelectTab={() => {}} />)
-    expect(screen.getByRole('button', { name: '진행현황' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '운영로그' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'README.md' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'CHANGELOG.md' })).toBeInTheDocument()
   })
 
   it('regline-hub 카드 제목을 표시한다', () => {

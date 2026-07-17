@@ -1,4 +1,6 @@
-/** CHANGELOG.md 섹션 → Works 운영로그 한 줄 (폴백·레거시) */
+import { fetchRawText } from './fetchRawText'
+
+/** CHANGELOG.md 섹션 → Works 한 줄 요약 (폴백·레거시) */
 export type ChangelogOpsEntry = {
   date: string
   text: string
@@ -36,7 +38,7 @@ export function parseChangelogMarkdown(markdown: string): ChangelogOpsEntry[] {
   return entries
 }
 
-/** `## 날짜 (vN)` 섹션별 본문 줄 — 운영로그 화면에 CHANGELOG 그대로 표시 */
+/** `## 날짜 (vN)` 섹션별 본문 줄 — CHANGELOG.md 탭에 그대로 표시 */
 export function parseChangelogSections(markdown: string): ChangelogSection[] {
   const sections: ChangelogSection[] = []
   const parts = markdown.split(/^## /m).slice(1)
@@ -63,17 +65,6 @@ export function parseChangelogSections(markdown: string): ChangelogSection[] {
 
   return sections
 }
-
-/** GitHub Raw — 인증 없이 공개 파일 조회 */
-const CHANGELOG_RAW_BASE =
-  'https://raw.githubusercontent.com/regline-dev/CHANGELOG/main/'
-
-/** CHANGELOG 레포 안 파일명 → Raw URL */
-export function changelogRawUrl(file: string): string {
-  return `${CHANGELOG_RAW_BASE}${file}`
-}
-
-import { fetchRawText } from './fetchRawText'
 
 export async function fetchChangelogMarkdown(
   url: string,

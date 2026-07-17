@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { WORKS_PROJECTS, type WorksTabId } from '../data/worksProjects'
 import {
-  changelogRawUrl,
   fetchChangelogSections,
   type ChangelogSection,
 } from '../data/parseChangelog'
@@ -14,11 +13,11 @@ type WorksPanelProps = {
   tab: WorksTabId
 }
 
-/** Works 오른쪽 패널 — 진행현황(README) / 운영로그(CHANGELOG) */
+/** Works 오른쪽 패널 — README.md / CHANGELOG.md */
 export function WorksPanel({ projectId, tab }: WorksPanelProps) {
   const project = WORKS_PROJECTS.find((p) => p.id === projectId)
   const title =
-    tab === 'status' ? '진행현황' : tab === 'ops' ? '운영로그' : '상세'
+    tab === 'status' ? 'README.md' : tab === 'ops' ? 'CHANGELOG.md' : '상세'
   const subtitle = project?.title ?? projectId
 
   return (
@@ -107,14 +106,20 @@ function OpsPanel({ projectId }: { projectId: string }) {
     | { status: 'ok'; sections: ChangelogSection[] }
     | { status: 'error'; message: string }
   >({ status: 'loading' })
-  const changelogFile =
-    WORKS_PROJECTS.find((p) => p.id === projectId)?.changelogFile ??
-    'regline-hub_CHANGELOG.md'
+  const project = WORKS_PROJECTS.find((p) => p.id === projectId)
+  const changelogUrl = project?.changelogRawUrl
 
   useEffect(() => {
     let cancelled = false
+    if (!changelogUrl) {
+      setState({
+        status: 'error',
+        message: 'CHANGELOG URL이 설정되지 않았습니다.',
+      })
+      return
+    }
 
-    fetchChangelogSections(changelogRawUrl(changelogFile))
+    fetchChangelogSections(changelogUrl)
       .then((sections) => {
         if (cancelled) return
         if (sections.length === 0) {
@@ -138,7 +143,7 @@ function OpsPanel({ projectId }: { projectId: string }) {
     return () => {
       cancelled = true
     }
-  }, [changelogFile])
+  }, [changelogUrl])
 
   if (state.status === 'loading') {
     return (
@@ -155,18 +160,24 @@ function OpsPanel({ projectId }: { projectId: string }) {
     )
   }
 
+  // Raw URL → blob URL (GitHub에서 보기)
+  const githubBlobUrl = changelogUrl
+    ?.replace(
+      'https://raw.githubusercontent.com/',
+      'https://github.com/',
+    )
+    .replace('/main/', '/blob/main/')
+
   return (
     <div className="works-panel__scroll">
       <ChangelogSectionView sections={state.sections} />
       <p className="works-detail__note">
-        <a
-          href={`https://github.com/regline-dev/CHANGELOG/blob/main/${changelogFile}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GitHub에서 보기
-        </a>
-        {` · ${changelogFile}`}
+        {githubBlobUrl && (
+          <a href={githubBlobUrl} target="_blank" rel="noopener noreferrer">
+            GitHub에서 보기
+          </a>
+        )}
+        {' · CHANGELOG.md'}
       </p>
     </div>
   )

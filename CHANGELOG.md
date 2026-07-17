@@ -1,0 +1,72 @@
+# regline-hub CHANGELOG
+
+포트폴리오 포털(`regline-hub`) 계획·구조·배포 변경 이력.
+파일에 버전을 표기하지 않고 이 문서에 누적한다.
+
+---
+
+## 2026-07-17 (v4)
+
+**변경 파일**: src/components/ChangelogSectionView.tsx, src/styles.css
+
+**변경 내용**: 운영로그(Works) 렌더링을 카드형 → 타임라인형으로 변경
+
+- 세로선+dot 타임라인 레이아웃, 날짜/버전 폰트 굵기 분리(날짜 500, 버전 400 muted)
+- 변경 파일 목록은 `<details>` 접기 처리(최신 항목만 기본 펼침), 모노스페이스 pill로 표시
+- 변경 내용 요약은 항상 노출, 데이터 파싱 로직(`parseChangelog.ts`)은 변경 없음
+
+---
+
+## 2026-07-17 (v3)
+
+**변경 파일**: Docs/20260717_Works_스플릿패널_계획.md, src/App.tsx, src/data/worksProjects.ts, README.md
+
+**변경 내용**: Works를 왼쪽 카드·오른쪽 패널(50:50)로 바꾸고, 진행현황=README·운영로그=CHANGELOG로 연결
+
+- 카드 제목: **regline-hub** (프로젝트명). CHANGELOG는 운영로그에 표시되는 내용
+- Works 카드 4개 구성: 챗봇/RAG 프로젝트, regline-hub, 다른 프로젝트 02, 다른 프로젝트 03
+- 진행현황/운영로그 클릭 시 페이지 이동 없이 오른쪽에만 표시
+- README를 샘플 양식(폴더 트리·표·현재 스냅샷, CHANGELOG와 역할 분리)으로 재작성 — Works 진행현황에 표시
+
+---
+
+## 2026-07-17 (v2)
+
+**변경 파일**: Docs/20260717_CHANGELOG_Works연동_계획.md, CHANGELOG/README.md, src/data/parseChangelog.ts, src/components/WorksDetail.tsx
+
+**변경 내용**: Works 운영로그 화면에 GitHub CHANGELOG 본문(날짜·변경 파일·불릿)을 그대로 표시
+
+- Works → **CHANGELOG** 카드(구 다른 프로젝트 01) → `regline-hub_CHANGELOG.md`
+- Works → **챗봇/RAG** → 운영로그 → `chatbot-rag_CHANGELOG.md`
+- 한 줄 요약 목록이 아니라 CHANGELOG 섹션 형식 그대로 표시
+
+---
+## 2026-07-17 (v1)
+
+**변경 파일**: Docs/20260716_regline-hub_Vercel배포_계획.md, .cursor/rules/changelog.mdc
+
+**변경 내용**: 호스팅을 Hetzner `:3003` → Vercel(옵션 A 단독 레포)로 확정
+
+- Production URL `regline-hub-three.vercel.app` 유지
+- CHANGELOG 규칙 도입 (구조/사양 변경만 기록)
+
+---
+
+## 2026-07-16 (v1)
+
+**변경 파일**: Docs/20260716_Worls_Links_작업계획.md, Docs/20260716_Works_구조_부록.md, src/App.tsx
+
+**변경 내용**: Works/Links 메뉴 분리, Profile 이력서 카드 추가
+
+- Projects(완성) / Works(진행) / Links(외부) 분리
+- 이유: 포털 골격 MVP
+
+---
+
+## 2026-07-15 (v1)
+
+**변경 파일**: Docs/20260715_포트폴리오_카드포털_계획.md
+
+**변경 내용**: regline-hub 카드 포털 MVP 착수
+
+- 카드 클릭 → 기존 서비스 이동, 데이터는 `works.ts` 한곳

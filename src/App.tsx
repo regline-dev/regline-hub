@@ -42,7 +42,7 @@ const SUPPORT_EMAIL = 'regline@naver.com'
 export function App({ cards }: AppProps) {
   const [activeView, setActiveView] = useState<HubView>('projects')
   const [isSupportOpen, setIsSupportOpen] = useState(false)
-  // Works 상세(진행현황/운영로그) — 사이드 Works 재클릭 시 목록으로 리셋
+  // Works 상세(README.md / CHANGELOG.md) — 사이드 Works 재클릭 시 목록으로 리셋
   const [worksDetail, setWorksDetail] = useState<{
     projectId: string
     tab: WorksTabId
@@ -263,7 +263,7 @@ function WorksView({
             <WorksPanel projectId={detail.projectId} tab={detail.tab} />
           ) : (
             <p className="works-split__empty">
-              카드에서 <strong>진행현황</strong> 또는 <strong>운영로그</strong>를 선택하세요.
+              카드에서 <strong>README.md</strong> 또는 <strong>CHANGELOG.md</strong>를 선택하세요.
             </p>
           )}
         </aside>

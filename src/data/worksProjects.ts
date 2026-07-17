@@ -11,24 +11,23 @@ export type WorksProject = {
   badges: string[]
   /** 표시할 탭 — 비어 있으면 '준비 중' 카드 */
   tabs: WorksTabId[]
-  /** 운영로그 — CHANGELOG 레포 파일명 */
-  changelogFile?: string
-  /** 진행현황 — GitHub README Raw URL */
+  /** CHANGELOG.md — 프로젝트 레포 Raw URL */
+  changelogRawUrl?: string
+  /** README.md — 프로젝트 레포 Raw URL */
   readmeRawUrl?: string
 }
 
 export const WORKS_PROJECTS: WorksProject[] = [
   {
-    id: 'chatbot-rag',
+    id: 'langgraph-agentic-backend',
     title: 'LangGraph-Agentic',
-    summary: 'LangChain 인제스트 + LangGraph Agentic 검색',
+    summary: 'PDF 모드용 LangGraph Agentic 검색 백엔드',
     badges: ['WIP'],
     tabs: ['status', 'ops'],
-    changelogFile: 'chatbot-rag_CHANGELOG.md',
-    // TODO: 실제 프로젝트 생성 + GitHub 레포 연결 후 changelogFile/readmeRawUrl을
-    // 전용 레포 기준으로 교체 (지금은 CHANGELOG 레포의 임시 README 사용 중)
+    changelogRawUrl:
+      'https://raw.githubusercontent.com/regline-dev/LangGraph-Agentic-backend/main/CHANGELOG.md',
     readmeRawUrl:
-      'https://raw.githubusercontent.com/regline-dev/CHANGELOG/main/chatbot-rag_README.md',
+      'https://raw.githubusercontent.com/regline-dev/LangGraph-Agentic-backend/main/README.md',
   },
   {
     id: 'regline-hub',
@@ -36,7 +35,8 @@ export const WORKS_PROJECTS: WorksProject[] = [
     summary: '포트폴리오 포털 — 카드로 작업물을 둘러보는 입구',
     badges: ['Live'],
     tabs: ['status', 'ops'],
-    changelogFile: 'regline-hub_CHANGELOG.md',
+    changelogRawUrl:
+      'https://raw.githubusercontent.com/regline-dev/regline-hub/main/CHANGELOG.md',
     readmeRawUrl:
       'https://raw.githubusercontent.com/regline-dev/regline-hub/main/README.md',
   },
@@ -64,8 +64,8 @@ export function assertWorksProjectsReady(projects: WorksProject[]): void {
     if (!p.id || !p.title || !Array.isArray(p.badges) || !Array.isArray(p.tabs)) {
       throw new Error(`Works 프로젝트 필드 누락: ${JSON.stringify(p)}`)
     }
-    if (p.tabs.includes('ops') && !p.changelogFile) {
-      throw new Error(`ops 탭에는 changelogFile이 필요합니다: ${p.id}`)
+    if (p.tabs.includes('ops') && !p.changelogRawUrl) {
+      throw new Error(`ops 탭에는 changelogRawUrl이 필요합니다: ${p.id}`)
     }
     if (p.tabs.includes('status') && !p.readmeRawUrl) {
       throw new Error(`status 탭에는 readmeRawUrl이 필요합니다: ${p.id}`)

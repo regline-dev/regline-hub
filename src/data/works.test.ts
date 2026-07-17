@@ -44,10 +44,15 @@ describe('WORKS_PROJECTS 스키마', () => {
       '다른 프로젝트 02',
       '다른 프로젝트 03',
     ])
-    expect(WORKS_PROJECTS[0].changelogFile).toBe('chatbot-rag_CHANGELOG.md')
-    expect(WORKS_PROJECTS[0].readmeRawUrl).toContain('chatbot-rag_README.md')
+    expect(WORKS_PROJECTS[0].id).toBe('langgraph-agentic-backend')
+    expect(WORKS_PROJECTS[0].changelogRawUrl).toContain(
+      'LangGraph-Agentic-backend/main/CHANGELOG.md',
+    )
+    expect(WORKS_PROJECTS[0].readmeRawUrl).toContain(
+      'LangGraph-Agentic-backend/main/README.md',
+    )
     expect(WORKS_PROJECTS[1].id).toBe('regline-hub')
-    expect(WORKS_PROJECTS[1].changelogFile).toBe('regline-hub_CHANGELOG.md')
+    expect(WORKS_PROJECTS[1].changelogRawUrl).toContain('regline-hub/main/CHANGELOG.md')
     expect(WORKS_PROJECTS[1].readmeRawUrl).toContain('regline-hub/main/README.md')
     expect(WORKS_PROJECTS[1].tabs).toEqual(['status', 'ops'])
   })

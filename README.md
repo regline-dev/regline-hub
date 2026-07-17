@@ -2,7 +2,7 @@
 
 > 포트폴리오 포털 — 카드로 작업물을 둘러보는 입구  
 > 호스팅: **Vercel** (정적 Vite SPA) · Production: https://regline-hub-three.vercel.app  
-> 이 문서는 **현재 상태 스냅샷(README)** 입니다. 날짜별 변경 이력은 [CHANGELOG](https://github.com/regline-dev/CHANGELOG)의 `regline-hub_CHANGELOG.md`에 둡니다.
+> 이 문서는 **현재 상태 스냅샷(README)** 입니다. 날짜별 변경 이력은 같은 레포의 [`CHANGELOG.md`](./CHANGELOG.md)에 둡니다.
 
 **README 작성 요령** (CHANGELOG와 다름)
 
@@ -23,7 +23,7 @@ regline-hub/
 │   └── budget_guide.html
 ├── src/
 │   ├── components/         # UI (ProjectCard, WorksCard, WorksPanel, …)
-│   ├── data/               # 카드·링크·CHANGELOG/README Raw 연동
+│   ├── data/               # 카드·링크·README/CHANGELOG Raw URL
 │   ├── App.tsx             # 사이드 네비 + Projects / Works / Links
 │   ├── main.tsx
 │   └── styles.css
@@ -31,7 +31,8 @@ regline-hub/
 ├── package.json
 ├── vite.config.ts
 ├── Dockerfile · nginx.conf # (레거시) Hetzner 정적 서빙용 — ~~주 배포 경로 아님~~
-└── README.md               # 본 문서 (Works → regline-hub → 진행현황에서 표시)
+├── CHANGELOG.md            # 변경 이력 (Works → CHANGELOG.md 탭)
+└── README.md               # 본 문서 (Works → README.md 탭)
 ```
 
 **구분 기준**
@@ -54,10 +55,10 @@ Projects 섹션 예: FAQ 챗봇 · 챗봇 관리자 · LottoInsight · Docs · P
 
 Works 카드 예:
 
-| 카드 제목 | 진행현황 | 운영로그 |
-|-----------|----------|----------|
-| 챗봇/RAG 프로젝트 | 해당 README Raw | `chatbot-rag_CHANGELOG.md` |
-| **regline-hub** | 이 README | `regline-hub_CHANGELOG.md` |
+| 카드 제목 | README.md | CHANGELOG.md |
+|-----------|-----------|--------------|
+| **LangGraph-Agentic** | `LangGraph-Agentic-backend` `/main/README.md` | 같은 레포 `/main/CHANGELOG.md` |
+| **regline-hub** | 이 README | 같은 레포 `CHANGELOG.md` |
 | 다른 프로젝트 02 | (준비 중) | — |
 | 다른 프로젝트 03 | (준비 중) | — |
 
@@ -68,12 +69,14 @@ Works 카드 예:
 ```
 왼쪽 ~40%                         오른쪽 ~60%
 Works 카드 한 줄 4개               선택한 탭 패널
-[챗봇/RAG][regline-hub][…][…]      진행현황 → README
-                                   운영로그 → CHANGELOG
+[LangGraph][regline-hub][…][…]     README.md → 프로젝트 README Raw
+                                   CHANGELOG.md → 같은 레포 CHANGELOG Raw
 ```
 
 - 페이지 이동 없음. 카드는 왼쪽 유지, 오른쪽만 갱신
 - 카드 제목 = **프로젝트명**
+- 탭 이름 = 실제 파일명 (`README.md` / `CHANGELOG.md`)
+- ~~전용 CHANGELOG GitHub 레포~~ → 쓰지 않음. 각 프로젝트 레포에 `CHANGELOG.md`를 둠
 
 ---
 
@@ -83,7 +86,8 @@ Works 카드 한 줄 4개               선택한 탭 패널
 |------|-------------|
 | Production | https://regline-hub-three.vercel.app |
 | 소스 | https://github.com/regline-dev/regline-hub |
-| 운영 이력 | https://github.com/regline-dev/CHANGELOG |
+| 변경 이력 | 이 레포 [`CHANGELOG.md`](./CHANGELOG.md) |
+| LangGraph Agentic | https://github.com/regline-dev/LangGraph-Agentic-backend |
 | FAQ 챗봇 UI | Hetzner `:3001` (카드 href) |
 | 챗봇 관리자 | Hetzner `:3002` |
 | LottoInsight | https://lotto-insight-pied.vercel.app |
@@ -115,5 +119,5 @@ npm run build      # dist/ → Vercel Output
 
 - `20260715_포트폴리오_카드포털_계획.md`
 - `20260716_Worls_Links_작업계획.md` · `20260716_Works_구조_부록.md`
-- `20260717_CHANGELOG_Works연동_계획.md`
+- `20260717_CHANGELOG_Works연동_계획.md` (~~전용 CHANGELOG 레포~~ → 프로젝트별 `CHANGELOG.md`로 이전됨)
 - `20260717_Works_스플릿패널_계획.md`

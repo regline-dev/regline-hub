@@ -8,7 +8,7 @@ type WorksCardProps = {
   onOpenPlain?: (projectId: string) => void
 }
 
-/** Works 그리드 카드 — 탭 있으면 진행현황/운영로그, 없으면 요약만 */
+/** Works 그리드 카드 — 탭 있으면 README.md / CHANGELOG.md, 없으면 요약만 */
 export function WorksCard({ project, activeTab, onSelectTab, onOpenPlain }: WorksCardProps) {
   return (
     <article className="works-card">
@@ -36,7 +36,7 @@ export function WorksCard({ project, activeTab, onSelectTab, onOpenPlain }: Work
               }
               onClick={() => onSelectTab(project.id, 'status')}
             >
-              진행현황
+              README.md
             </button>
           )}
           {project.tabs.includes('ops') && (
@@ -47,7 +47,7 @@ export function WorksCard({ project, activeTab, onSelectTab, onOpenPlain }: Work
               }
               onClick={() => onSelectTab(project.id, 'ops')}
             >
-              운영로그
+              CHANGELOG.md
             </button>
           )}
         </div>
