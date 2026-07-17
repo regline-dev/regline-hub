@@ -52,7 +52,7 @@ export const WORKS_STATUS = {
   ],
 }
 
-/** 운영로그 탭 — 누적 일지 stub (부록 §4, 이후 ops-log 폴더로 교체) */
+/** 운영로그 탭 — GitHub 조회 실패 시 폴백 stub */
 export const WORKS_OPS_LOG: { date: string; text: string }[] = [
   { date: '20260716', text: 'Groq API 전환 (LLM_PROVIDER 라우팅)' },
   { date: '20260714', text: 'Dockerfile 시크릿 노출 이슈 수정' },

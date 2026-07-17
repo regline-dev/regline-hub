@@ -1,4 +1,10 @@
+import { useEffect, useState } from 'react'
 import { WORKS_OPS_LOG, WORKS_STATUS, type WorksTabId } from '../data/worksProjects'
+import {
+  fetchChangelogOps,
+  type ChangelogOpsEntry,
+  REGLINE_HUB_CHANGELOG_RAW_URL,
+} from '../data/parseChangelog'
 
 type WorksDetailProps = {
   tab: WorksTabId
@@ -73,17 +79,82 @@ function StatusBody() {
   )
 }
 
+type OpsLoadState =
+  | { status: 'loading' }
+  | { status: 'ok'; entries: ChangelogOpsEntry[]; fromRemote: true }
+  | { status: 'fallback'; entries: ChangelogOpsEntry[]; message: string }
+
+/** 운영로그 — GitHub CHANGELOG Raw 조회, 실패 시 stub 폴백 */
 function OpsBody() {
+  const [state, setState] = useState<OpsLoadState>({ status: 'loading' })
+
+  useEffect(() => {
+    let cancelled = false
+
+    fetchChangelogOps()
+      .then((entries) => {
+        if (cancelled) return
+        if (entries.length === 0) {
+          setState({
+            status: 'fallback',
+            entries: WORKS_OPS_LOG,
+            message: 'CHANGELOG가 비어 있어 로컬 로그를 표시합니다.',
+          })
+          return
+        }
+        setState({ status: 'ok', entries, fromRemote: true })
+      })
+      .catch(() => {
+        if (cancelled) return
+        setState({
+          status: 'fallback',
+          entries: WORKS_OPS_LOG,
+          message: 'CHANGELOG를 불러오지 못해 로컬 로그를 표시합니다.',
+        })
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (state.status === 'loading') {
+    return (
+      <div className="works-detail__body">
+        <p className="works-detail__note" role="status">
+          운영로그 불러오는 중…
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="works-detail__body">
+      {state.status === 'fallback' && (
+        <p className="works-detail__note" role="status">
+          {state.message}
+        </p>
+      )}
       <ul className="works-detail__ops">
-        {WORKS_OPS_LOG.map((entry) => (
+        {state.entries.map((entry) => (
           <li key={`${entry.date}-${entry.text}`} className="works-detail__ops-item">
             <span className="works-detail__ops-date">{entry.date}</span>
             <span className="works-detail__ops-text">{entry.text}</span>
           </li>
         ))}
       </ul>
+      <p className="works-detail__note">
+        <a
+          href="https://github.com/regline-dev/CHANGELOG"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub CHANGELOG
+        </a>
+        {state.status === 'ok' ? ' · Raw 동기화' : null}
+      </p>
+      {/* Raw URL은 디버그용으로 상수만 참조 — 화면에는 노출하지 않음 */}
+      <span hidden data-changelog-url={REGLINE_HUB_CHANGELOG_RAW_URL} />
     </div>
   )
 }
