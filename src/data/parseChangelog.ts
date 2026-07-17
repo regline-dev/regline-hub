@@ -31,11 +31,16 @@ export function parseChangelogMarkdown(markdown: string): ChangelogOpsEntry[] {
 }
 
 /** GitHub Raw — 인증 없이 공개 파일 조회 */
-export const REGLINE_HUB_CHANGELOG_RAW_URL =
-  'https://raw.githubusercontent.com/regline-dev/CHANGELOG/main/regline-hub_CHANGELOG.md'
+const CHANGELOG_RAW_BASE =
+  'https://raw.githubusercontent.com/regline-dev/CHANGELOG/main/'
+
+/** CHANGELOG 레포 안 파일명 → Raw URL */
+export function changelogRawUrl(file: string): string {
+  return `${CHANGELOG_RAW_BASE}${file}`
+}
 
 export async function fetchChangelogOps(
-  url: string = REGLINE_HUB_CHANGELOG_RAW_URL,
+  url: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<ChangelogOpsEntry[]> {
   const response = await fetchImpl(url)

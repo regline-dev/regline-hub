@@ -9,8 +9,10 @@ export type WorksProject = {
   title: string
   summary: string
   badges: string[]
-  /** true면 [진행현황][운영로그] 탭 표시 */
-  hasTabs: boolean
+  /** 표시할 탭 — 비어 있으면 '준비 중' 카드 */
+  tabs: WorksTabId[]
+  /** 운영로그 탭이 읽을 CHANGELOG 레포 파일명 (ops 탭 필수) */
+  changelogFile?: string
 }
 
 export const WORKS_PROJECTS: WorksProject[] = [
@@ -19,21 +21,23 @@ export const WORKS_PROJECTS: WorksProject[] = [
     title: '챗봇/RAG 프로젝트',
     summary: 'LangChain 인제스트 + LangGraph Agentic 검색',
     badges: ['WIP'],
-    hasTabs: true,
+    tabs: ['status', 'ops'],
+    changelogFile: 'chatbot-rag_CHANGELOG.md',
   },
   {
-    id: 'works-placeholder-01',
-    title: '다른 프로젝트 01',
-    summary: '준비 중 — 대상 확정 후 채웁니다.',
-    badges: ['Soon'],
-    hasTabs: false,
+    id: 'regline-hub-portal',
+    title: 'regline-hub (포트폴리오 포털)',
+    summary: '이 포털 자체의 계획·배포·운영 변경 기록',
+    badges: ['Live'],
+    tabs: ['ops'],
+    changelogFile: 'regline-hub_CHANGELOG.md',
   },
   {
     id: 'works-placeholder-02',
     title: '다른 프로젝트 02',
     summary: '준비 중 — 대상 확정 후 채웁니다.',
     badges: ['Soon'],
-    hasTabs: false,
+    tabs: [],
   },
 ]
 
@@ -65,8 +69,11 @@ export function assertWorksProjectsReady(projects: WorksProject[]): void {
     throw new Error('Works 프로젝트가 비어 있습니다.')
   }
   for (const p of projects) {
-    if (!p.id || !p.title || !Array.isArray(p.badges)) {
+    if (!p.id || !p.title || !Array.isArray(p.badges) || !Array.isArray(p.tabs)) {
       throw new Error(`Works 프로젝트 필드 누락: ${JSON.stringify(p)}`)
+    }
+    if (p.tabs.includes('ops') && !p.changelogFile) {
+      throw new Error(`ops 탭에는 changelogFile이 필요합니다: ${p.id}`)
     }
   }
 }

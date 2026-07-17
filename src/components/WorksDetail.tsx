@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react'
-import { WORKS_OPS_LOG, WORKS_STATUS, type WorksTabId } from '../data/worksProjects'
 import {
+  WORKS_OPS_LOG,
+  WORKS_PROJECTS,
+  WORKS_STATUS,
+  type WorksTabId,
+} from '../data/worksProjects'
+import {
+  changelogRawUrl,
   fetchChangelogOps,
   type ChangelogOpsEntry,
-  REGLINE_HUB_CHANGELOG_RAW_URL,
 } from '../data/parseChangelog'
 
 type WorksDetailProps = {
+  projectId: string
   tab: WorksTabId
   onBack: () => void
 }
 
 /** Works 상세 — 진행현황 스냅샷 / 운영로그 목록 */
-export function WorksDetail({ tab, onBack }: WorksDetailProps) {
+export function WorksDetail({ projectId, tab, onBack }: WorksDetailProps) {
   const title = tab === 'status' ? WORKS_STATUS.title : '배포·운영 로그'
   const badge = tab === 'status' ? WORKS_STATUS.badge : undefined
 
@@ -26,7 +32,7 @@ export function WorksDetail({ tab, onBack }: WorksDetailProps) {
         {badge && <span className="works-detail__badge">{badge}</span>}
       </header>
 
-      {tab === 'status' ? <StatusBody /> : <OpsBody />}
+      {tab === 'status' ? <StatusBody /> : <OpsBody projectId={projectId} />}
     </div>
   )
 }
@@ -84,14 +90,17 @@ type OpsLoadState =
   | { status: 'ok'; entries: ChangelogOpsEntry[]; fromRemote: true }
   | { status: 'fallback'; entries: ChangelogOpsEntry[]; message: string }
 
-/** 운영로그 — GitHub CHANGELOG Raw 조회, 실패 시 stub 폴백 */
-function OpsBody() {
+/** 운영로그 — 카드별 CHANGELOG 파일을 Raw 조회, 실패 시 stub 폴백 */
+function OpsBody({ projectId }: { projectId: string }) {
   const [state, setState] = useState<OpsLoadState>({ status: 'loading' })
+  const changelogFile =
+    WORKS_PROJECTS.find((p) => p.id === projectId)?.changelogFile ??
+    'regline-hub_CHANGELOG.md'
 
   useEffect(() => {
     let cancelled = false
 
-    fetchChangelogOps()
+    fetchChangelogOps(changelogRawUrl(changelogFile))
       .then((entries) => {
         if (cancelled) return
         if (entries.length === 0) {
@@ -116,7 +125,7 @@ function OpsBody() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [changelogFile])
 
   if (state.status === 'loading') {
     return (
@@ -153,8 +162,6 @@ function OpsBody() {
         </a>
         {state.status === 'ok' ? ' · Raw 동기화' : null}
       </p>
-      {/* Raw URL은 디버그용으로 상수만 참조 — 화면에는 노출하지 않음 */}
-      <span hidden data-changelog-url={REGLINE_HUB_CHANGELOG_RAW_URL} />
     </div>
   )
 }

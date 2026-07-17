@@ -24,22 +24,26 @@ export function WorksCard({ project, onSelectTab, onOpenPlain }: WorksCardProps)
         <p className="works-card__summary">{project.summary}</p>
       </div>
 
-      {project.hasTabs ? (
+      {project.tabs.length > 0 ? (
         <div className="works-card__tabs" role="group" aria-label={`${project.title} 탭`}>
-          <button
-            type="button"
-            className="works-card__tab"
-            onClick={() => onSelectTab(project.id, 'status')}
-          >
-            진행현황
-          </button>
-          <button
-            type="button"
-            className="works-card__tab"
-            onClick={() => onSelectTab(project.id, 'ops')}
-          >
-            운영로그
-          </button>
+          {project.tabs.includes('status') && (
+            <button
+              type="button"
+              className="works-card__tab"
+              onClick={() => onSelectTab(project.id, 'status')}
+            >
+              진행현황
+            </button>
+          )}
+          {project.tabs.includes('ops') && (
+            <button
+              type="button"
+              className="works-card__tab"
+              onClick={() => onSelectTab(project.id, 'ops')}
+            >
+              운영로그
+            </button>
+          )}
         </div>
       ) : (
         <button

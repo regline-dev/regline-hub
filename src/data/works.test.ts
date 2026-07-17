@@ -64,15 +64,26 @@ describe('LINK_ITEMS 스키마', () => {
 })
 
 describe('WORKS_PROJECTS 스키마', () => {
-  it('부록 그리드용 카드 3장과 탭 플래그를 가진다', () => {
+  it('카드별 탭·CHANGELOG 파일 매핑을 가진다', () => {
     expect(() => assertWorksProjectsReady(WORKS_PROJECTS)).not.toThrow()
     expect(WORKS_PROJECTS.map((p) => p.title)).toEqual([
       '챗봇/RAG 프로젝트',
-      '다른 프로젝트 01',
+      'regline-hub (포트폴리오 포털)',
       '다른 프로젝트 02',
     ])
-    expect(WORKS_PROJECTS[0].hasTabs).toBe(true)
-    expect(WORKS_PROJECTS[1].hasTabs).toBe(false)
+    expect(WORKS_PROJECTS[0].tabs).toEqual(['status', 'ops'])
+    expect(WORKS_PROJECTS[0].changelogFile).toBe('chatbot-rag_CHANGELOG.md')
+    expect(WORKS_PROJECTS[1].tabs).toEqual(['ops'])
+    expect(WORKS_PROJECTS[1].changelogFile).toBe('regline-hub_CHANGELOG.md')
+    expect(WORKS_PROJECTS[2].tabs).toEqual([])
+  })
+
+  it('ops 탭이 있는데 changelogFile이 없으면 에러', () => {
+    expect(() =>
+      assertWorksProjectsReady([
+        { id: 'x', title: 'x', summary: 's', badges: [], tabs: ['ops'] },
+      ]),
+    ).toThrow(/changelogFile/)
   })
 })
 

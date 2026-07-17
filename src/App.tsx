@@ -234,6 +234,7 @@ function WorksView({
   if (detail) {
     return (
       <WorksDetail
+        projectId={detail.projectId}
         tab={detail.tab}
         onBack={() => setDetail(null)}
       />

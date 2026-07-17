@@ -64,10 +64,12 @@ describe('사이드 네비 · Works · Links', () => {
     )
     expect(screen.queryByRole('heading', { level: 1, name: 'Projects' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '챗봇/RAG 프로젝트' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '다른 프로젝트 01' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'regline-hub (포트폴리오 포털)' }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '다른 프로젝트 02' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '진행현황' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '운영로그' })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: '운영로그' })).toHaveLength(2)
 
     await user.click(screen.getByRole('button', { name: 'Links' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Links' })).toBeInTheDocument()
@@ -120,7 +122,7 @@ describe('사이드 네비 · Works · Links', () => {
     renderHub()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
-    await user.click(screen.getByRole('button', { name: '운영로그' }))
+    await user.click(screen.getAllByRole('button', { name: '운영로그' })[0])
     expect(screen.getByRole('heading', { name: '배포·운영 로그' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
