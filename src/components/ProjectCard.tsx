@@ -1,20 +1,47 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { WorkCard } from '../data/works'
 
 type ProjectCardProps = {
   card: WorkCard
+  /** hubTarget 카드 클릭 시 Works 등 내부 화면으로 이동 */
+  onHubNavigate?: (target: NonNullable<WorkCard['hubTarget']>) => void
 }
 
 /**
  * 다크 헤더(프로젝트별 아이콘+제목+⋯+배지) / 흰 푸터(+ CTA)
  * 카드 사이즈는 균일 유지, 아이콘만 프로젝트 성격에 맞게 분기
  */
-export function ProjectCard({ card }: ProjectCardProps) {
+export function ProjectCard({ card, onHubNavigate }: ProjectCardProps) {
+  const className = card.disabled ? 'project-card project-card--disabled' : 'project-card'
+  const body = <ProjectCardBody card={card} />
+
+  // Works 내부 이동 — 외부 GitHub 링크가 아님
+  if (card.hubTarget) {
+    return (
+      <button
+        type="button"
+        className={className}
+        onClick={() => onHubNavigate?.(card.hubTarget!)}
+      >
+        {body}
+      </button>
+    )
+  }
+
+  const hasLink = card.href !== '#'
   return (
     <a
-      className={card.disabled ? 'project-card project-card--disabled' : 'project-card'}
-      {...(card.disabled ? {} : { href: card.href, target: '_blank', rel: 'noopener noreferrer' })}
+      className={className}
+      {...(hasLink ? { href: card.href, target: '_blank', rel: 'noopener noreferrer' } : {})}
     >
+      {body}
+    </a>
+  )
+}
+
+function ProjectCardBody({ card }: { card: WorkCard }): ReactNode {
+  return (
+    <>
       <div
         className={
           card.id === 'faq-chatbot' ||
@@ -64,23 +91,22 @@ export function ProjectCard({ card }: ProjectCardProps) {
         {card.section === 'docs' && <DocThumbnail />}
         {card.section === 'profile' && <ProfileThumbnail />}
 
-        {/* 시각적으로 헤더 하단에 여유 — 첨부 카드처럼 컴팩트하게 */}
         <p className="project-card__summary">{card.summary}</p>
       </div>
 
       <div className="project-card__footer">
         <span className="project-card__action">+ {card.actionLabel}</span>
       </div>
-    </a>
+    </>
   )
 }
 
 /** 문서/페이지 아이콘 — 접힌 모서리 + 텍스트 줄, DocThumbnail·ProfileThumbnail 공용 */
-/** agentic-rag 카드 전용 — 개발 중 플레이스홀더 (점선 박스 + 라벨) */
+/** agentic-rag 카드 전용 — CHANGELOG 링크 안내 (기존 점선 배경 유지) */
 function AgenticRagThumbnail() {
   return (
     <div className="agentic-thumbnail" aria-hidden="true">
-      <span className="agentic-thumbnail__label">개발 중</span>
+      <span className="agentic-thumbnail__label">CHANGELOG.md</span>
     </div>
   )
 }

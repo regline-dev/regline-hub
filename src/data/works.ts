@@ -13,8 +13,10 @@ export type WorkCard = {
   href: string
   /** 카드가 속한 섹션 — 미지정 시 'projects' */
   section?: 'projects' | 'docs' | 'profile' | 'works'
-  /** true면 링크 비활성화(개발 중 등) — href는 무시되고 카드는 흐리게 표시 */
+  /** true면 흐린 개발 중 배경을 유지한다. hubTarget이 있으면 내부 이동은 동작한다. */
   disabled?: boolean
+  /** hub 내부 Works 패널로 이동 (외부 URL 대신) */
+  hubTarget?: { projectId: string; tab: 'status' | 'ops' }
 }
 
 /** 빌드 시 호스트 없이도 동작하는 정적 카드 정의 */
@@ -38,11 +40,13 @@ export const WORK_CARDS: WorkCard[] = [
   {
     id: 'agentic-rag',
     title: 'LangGraph-Agentic RAG',
-    summary: '로드 → 청킹 → 벡터화 → LLM 판단 Agentic',
+    summary: '로드→청킹→벡터화→LLM 판단 Agentic',
     badges: ['Owner', 'In Progress'],
-    actionLabel: 'COMING SOON',
+    actionLabel: 'CHANGELOG.md',
     href: '#',
     disabled: true,
+    // Projects → Works → LangGraph-Agentic → CHANGELOG.md
+    hubTarget: { projectId: 'langgraph-agentic-backend', tab: 'ops' },
   },
   {
     id: 'lotto-insight',

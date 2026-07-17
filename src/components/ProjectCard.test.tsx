@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { ProjectCard } from '../components/ProjectCard'
 import type { WorkCard } from '../data/works'
 
@@ -10,6 +10,17 @@ const sampleCard: WorkCard = {
   badges: ['Live', 'Hetzner'],
   actionLabel: 'OPEN APP',
   href: 'http://example.com:3001',
+}
+
+const agenticCard: WorkCard = {
+  id: 'agentic-rag',
+  title: 'LangGraph-Agentic RAG',
+  summary: '로드→청킹→벡터화→LLM 판단 Agentic',
+  badges: ['Owner', 'In Progress'],
+  actionLabel: 'CHANGELOG.md',
+  href: '#',
+  disabled: true,
+  hubTarget: { projectId: 'langgraph-agentic-backend', tab: 'ops' },
 }
 
 describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
@@ -24,5 +35,20 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(link).toHaveAttribute('target', '_blank')
     // 카드 전체가 링크이므로 제목도 그 안에 포함돼야 한다
     expect(link).toContainElement(screen.getByRole('heading', { name: 'faq-chatbot' }))
+  })
+
+  it('Agentic 카드는 흐린 배경을 유지하고 Works CHANGELOG로 이동한다', () => {
+    const onHubNavigate = vi.fn()
+    render(<ProjectCard card={agenticCard} onHubNavigate={onHubNavigate} />)
+
+    const button = screen.getByRole('button', { name: /CHANGELOG\.md/i })
+    expect(button).toHaveClass('project-card--disabled')
+    expect(screen.getByText('로드→청킹→벡터화→LLM 판단 Agentic')).toBeInTheDocument()
+
+    button.click()
+    expect(onHubNavigate).toHaveBeenCalledWith({
+      projectId: 'langgraph-agentic-backend',
+      tab: 'ops',
+    })
   })
 })

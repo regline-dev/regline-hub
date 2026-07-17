@@ -114,7 +114,15 @@ export function App({ cards }: AppProps) {
               : 'shell__main'
           }
         >
-          {activeView === 'projects' && <ProjectsView cards={cards} />}
+          {activeView === 'projects' && (
+            <ProjectsView
+              cards={cards}
+              onHubNavigate={(target) => {
+                setActiveView('works')
+                setWorksDetail(target)
+              }}
+            />
+          )}
           {activeView === 'works' && (
             <WorksView detail={worksDetail} setDetail={setWorksDetail} />
           )}
@@ -185,7 +193,13 @@ export function App({ cards }: AppProps) {
   )
 }
 
-function ProjectsView({ cards }: { cards: WorkCard[] }) {
+function ProjectsView({
+  cards,
+  onHubNavigate,
+}: {
+  cards: WorkCard[]
+  onHubNavigate: (target: NonNullable<WorkCard['hubTarget']>) => void
+}) {
   return (
     <>
       <div className="shell__main-head">
@@ -199,7 +213,7 @@ function ProjectsView({ cards }: { cards: WorkCard[] }) {
         {cards
           .filter((card) => (card.section ?? 'projects') === 'projects')
           .map((card) => (
-            <ProjectCard key={card.id} card={card} />
+            <ProjectCard key={card.id} card={card} onHubNavigate={onHubNavigate} />
           ))}
       </section>
 
@@ -211,7 +225,7 @@ function ProjectsView({ cards }: { cards: WorkCard[] }) {
         {cards
           .filter((card) => card.section === 'docs')
           .map((card) => (
-            <ProjectCard key={card.id} card={card} />
+            <ProjectCard key={card.id} card={card} onHubNavigate={onHubNavigate} />
           ))}
       </section>
 
@@ -223,7 +237,7 @@ function ProjectsView({ cards }: { cards: WorkCard[] }) {
         {cards
           .filter((card) => card.section === 'profile')
           .map((card) => (
-            <ProjectCard key={card.id} card={card} />
+            <ProjectCard key={card.id} card={card} onHubNavigate={onHubNavigate} />
           ))}
       </section>
     </>

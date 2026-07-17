@@ -283,12 +283,18 @@ body {
 .project-card {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
   background: var(--card-footer);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   text-decoration: none;
+  text-align: left;
+  font: inherit;
   color: inherit;
   cursor: pointer;
 }
@@ -298,9 +304,9 @@ body {
   box-shadow: 0 6px 18px rgba(26, 31, 38, 0.12);
 }
 
-/* 개발 중 등 링크 비활성 카드 — 흐린 회색, hover 반응 없음 */
+/* 개발 중 카드 — 링크는 동작하되 흐린 회색 배경과 hover 없음 */
 .project-card--disabled {
-  cursor: default;
+  cursor: pointer;
 }
 
 .project-card--disabled:hover {
@@ -613,7 +619,7 @@ body {
   color: var(--icon-rose-ink);
 }
 
-/* agentic-rag 카드 전용 — 개발 중 플레이스홀더 (점선 박스) */
+/* agentic-rag 카드 전용 — CHANGELOG 링크 안내 (점선 배경 유지) */
 .agentic-thumbnail {
   height: 140px;
   border-radius: 6px;
@@ -872,8 +878,8 @@ body {
 }
 
 .works-panel__title-tab {
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.85rem;
+  font-weight: 400;
   color: var(--muted);
 }
 
@@ -1020,8 +1026,8 @@ body {
   background: #fafbfc;
   padding: 0.75rem 0.5rem;
   font: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 400;
   color: var(--ink);
   cursor: pointer;
 }

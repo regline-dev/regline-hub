@@ -92,4 +92,16 @@ describe('사이드 네비 · Works · Links', () => {
     await user.click(screen.getByRole('button', { name: 'Links' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Links' })).toBeInTheDocument()
   })
+
+  it('Projects Agentic 카드 클릭 시 Works → LangGraph CHANGELOG.md로 이동한다', async () => {
+    const user = userEvent.setup()
+    renderHub()
+
+    await user.click(screen.getByRole('button', { name: /CHANGELOG\.md/i }))
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Works' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'LangGraph-Agentic CHANGELOG.md' }),
+    ).toBeInTheDocument()
+  })
 })
