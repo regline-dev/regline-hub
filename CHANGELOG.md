@@ -5,6 +5,17 @@
 
 ---
 
+## 2026-07-17 (v5)
+
+**변경 파일**: src/data/fetchRawText.ts, src/data/fetchRawText.test.ts
+
+**변경 내용**: Works README·CHANGELOG 조회가 GitHub Raw CDN 캐시를 쓰지 않게 수정
+
+- `fetchRawText`에 `cache: 'no-store'` 적용 — 프로젝트 push 후에도 Works 탭이 예전 CHANGELOG를 보여주던 현상 완화
+- LangGraph-Agentic-backend 등 외부 레포 push만으로 CHANGELOG.md 탭이 최신 내용을 읽도록 함 (regline-hub 재배포 필요)
+
+---
+
 ## 2026-07-17 (v4)
 
 **변경 파일**: src/components/ChangelogSectionView.tsx, src/styles.css

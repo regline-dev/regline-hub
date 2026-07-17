@@ -10,6 +10,9 @@ describe('fetchRawText', () => {
     await expect(fetchRawText('https://example.test/README.md', fetchImpl)).resolves.toBe(
       '# Hello\n',
     )
+    expect(fetchImpl).toHaveBeenCalledWith('https://example.test/README.md', {
+      cache: 'no-store',
+    })
   })
 
   it('HTTP 실패 시 에러를 던진다', async () => {
