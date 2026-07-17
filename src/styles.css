@@ -786,26 +786,26 @@ body {
   align-items: stretch;
 }
 
-/* Works 50:50 — 왼쪽 카드 / 오른쪽 패널 */
+/* Works — 카드 한 줄 3개(원 크기) + 아래 상세 패널 */
 .works-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.25rem;
-  align-items: start;
-  min-height: 28rem;
+  align-items: stretch;
+  min-height: 0;
 }
 
 .works-split__cards {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.85rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+  align-items: stretch;
 }
 
 .works-split__panel {
-  position: sticky;
-  top: 1rem;
-  min-height: 24rem;
-  max-height: calc(100vh - 6rem);
+  position: static;
+  min-height: 18rem;
+  max-height: none;
   overflow: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -814,7 +814,7 @@ body {
 }
 
 .works-split__empty {
-  margin: 2rem 1rem;
+  margin: 1.25rem 0.5rem;
   color: var(--muted);
   font-size: 0.95rem;
   line-height: 1.5;
@@ -907,13 +907,8 @@ body {
 }
 
 @media (max-width: 900px) {
-  .works-split {
+  .works-split__cards {
     grid-template-columns: 1fr;
-  }
-
-  .works-split__panel {
-    position: static;
-    max-height: none;
   }
 }
 
