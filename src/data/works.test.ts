@@ -39,9 +39,10 @@ describe('WORKS_PROJECTS 스키마', () => {
   it('카드별 탭·README·CHANGELOG 매핑을 가진다', () => {
     expect(() => assertWorksProjectsReady(WORKS_PROJECTS)).not.toThrow()
     expect(WORKS_PROJECTS.map((p) => p.title)).toEqual([
-      '챗봇/RAG 프로젝트',
+      'LangGraph-Agentic',
       'regline-hub',
       '다른 프로젝트 02',
+      '다른 프로젝트 03',
     ])
     expect(WORKS_PROJECTS[0].changelogFile).toBe('chatbot-rag_CHANGELOG.md')
     expect(WORKS_PROJECTS[0].readmeRawUrl).toContain('chatbot-rag_README.md')

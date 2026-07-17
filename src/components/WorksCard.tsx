@@ -2,12 +2,14 @@ import type { WorksProject, WorksTabId } from '../data/worksProjects'
 
 type WorksCardProps = {
   project: WorksProject
+  /** 현재 오른쪽 패널에 표시 중인 탭 — 이 카드 것이 아니면 null */
+  activeTab?: WorksTabId | null
   onSelectTab: (projectId: string, tab: WorksTabId) => void
   onOpenPlain?: (projectId: string) => void
 }
 
 /** Works 그리드 카드 — 탭 있으면 진행현황/운영로그, 없으면 요약만 */
-export function WorksCard({ project, onSelectTab, onOpenPlain }: WorksCardProps) {
+export function WorksCard({ project, activeTab, onSelectTab, onOpenPlain }: WorksCardProps) {
   return (
     <article className="works-card">
       <div className="works-card__header">
@@ -29,7 +31,9 @@ export function WorksCard({ project, onSelectTab, onOpenPlain }: WorksCardProps)
           {project.tabs.includes('status') && (
             <button
               type="button"
-              className="works-card__tab"
+              className={
+                activeTab === 'status' ? 'works-card__tab works-card__tab--active' : 'works-card__tab'
+              }
               onClick={() => onSelectTab(project.id, 'status')}
             >
               진행현황
@@ -38,7 +42,9 @@ export function WorksCard({ project, onSelectTab, onOpenPlain }: WorksCardProps)
           {project.tabs.includes('ops') && (
             <button
               type="button"
-              className="works-card__tab"
+              className={
+                activeTab === 'ops' ? 'works-card__tab works-card__tab--active' : 'works-card__tab'
+              }
               onClick={() => onSelectTab(project.id, 'ops')}
             >
               운영로그

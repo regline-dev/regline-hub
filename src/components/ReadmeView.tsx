@@ -4,7 +4,14 @@ type ReadmeViewProps = {
 
 /** README Markdown을 가벼운 줄 단위로 표시 (풀 MD 엔진 없이) */
 export function ReadmeView({ markdown }: ReadmeViewProps) {
-  const lines = markdown.replace(/\r\n/g, '\n').split('\n')
+  const allLines = markdown.replace(/\r\n/g, '\n').split('\n')
+
+  // README 맨 위 H1 제목은 패널 헤더(프로젝트명)와 중복되므로 첫 H1 한 줄만 제외
+  const firstH1Index = allLines.findIndex((line) => line.startsWith('# '))
+  const lines =
+    firstH1Index === -1
+      ? allLines
+      : allLines.filter((_, index) => index !== firstH1Index)
 
   return (
     <div className="readme-view">

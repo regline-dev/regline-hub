@@ -107,7 +107,13 @@ export function App({ cards }: AppProps) {
       </aside>
 
       <div className="shell__content">
-        <main className="shell__main">
+        <main
+          className={
+            activeView === 'works'
+              ? 'shell__main shell__main--works'
+              : 'shell__main'
+          }
+        >
           {activeView === 'projects' && <ProjectsView cards={cards} />}
           {activeView === 'works' && (
             <WorksView detail={worksDetail} setDetail={setWorksDetail} />
@@ -246,6 +252,7 @@ function WorksView({
             <WorksCard
               key={project.id}
               project={project}
+              activeTab={detail && detail.projectId === project.id ? detail.tab : null}
               onSelectTab={(projectId, tab) => setDetail({ projectId, tab })}
             />
           ))}
@@ -253,11 +260,7 @@ function WorksView({
 
         <aside className="works-split__panel" aria-label="Works 상세 패널">
           {detail ? (
-            <WorksPanel
-              projectId={detail.projectId}
-              tab={detail.tab}
-              onClear={() => setDetail(null)}
-            />
+            <WorksPanel projectId={detail.projectId} tab={detail.tab} />
           ) : (
             <p className="works-split__empty">
               카드에서 <strong>진행현황</strong> 또는 <strong>운영로그</strong>를 선택하세요.

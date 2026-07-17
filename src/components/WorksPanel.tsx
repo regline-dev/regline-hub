@@ -12,11 +12,10 @@ import { ReadmeView } from './ReadmeView'
 type WorksPanelProps = {
   projectId: string
   tab: WorksTabId
-  onClear: () => void
 }
 
 /** Works 오른쪽 패널 — 진행현황(README) / 운영로그(CHANGELOG) */
-export function WorksPanel({ projectId, tab, onClear }: WorksPanelProps) {
+export function WorksPanel({ projectId, tab }: WorksPanelProps) {
   const project = WORKS_PROJECTS.find((p) => p.id === projectId)
   const title =
     tab === 'status' ? '진행현황' : tab === 'ops' ? '운영로그' : '상세'
@@ -25,12 +24,11 @@ export function WorksPanel({ projectId, tab, onClear }: WorksPanelProps) {
   return (
     <div className="works-panel">
       <header className="works-panel__header">
-        <button type="button" className="works-panel__clear" onClick={onClear}>
-          선택 해제
-        </button>
         <div className="works-panel__titles">
-          <h2 className="works-panel__title">{title}</h2>
-          <p className="works-panel__subtitle">{subtitle}</p>
+          <h2 className="works-panel__title">
+            <span className="works-panel__title-name">{subtitle}</span>{' '}
+            <span className="works-panel__title-tab">{title}</span>
+          </h2>
         </div>
       </header>
 

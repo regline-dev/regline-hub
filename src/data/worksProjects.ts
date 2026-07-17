@@ -20,12 +20,13 @@ export type WorksProject = {
 export const WORKS_PROJECTS: WorksProject[] = [
   {
     id: 'chatbot-rag',
-    title: '챗봇/RAG 프로젝트',
+    title: 'LangGraph-Agentic',
     summary: 'LangChain 인제스트 + LangGraph Agentic 검색',
     badges: ['WIP'],
     tabs: ['status', 'ops'],
     changelogFile: 'chatbot-rag_CHANGELOG.md',
-    // 전용 레포 README 공개 전까지 CHANGELOG 레포의 임시 README 사용
+    // TODO: 실제 프로젝트 생성 + GitHub 레포 연결 후 changelogFile/readmeRawUrl을
+    // 전용 레포 기준으로 교체 (지금은 CHANGELOG 레포의 임시 README 사용 중)
     readmeRawUrl:
       'https://raw.githubusercontent.com/regline-dev/CHANGELOG/main/chatbot-rag_README.md',
   },
@@ -42,6 +43,13 @@ export const WORKS_PROJECTS: WorksProject[] = [
   {
     id: 'works-placeholder-02',
     title: '다른 프로젝트 02',
+    summary: '준비 중 — 대상 확정 후 채웁니다.',
+    badges: ['Soon'],
+    tabs: [],
+  },
+  {
+    id: 'works-placeholder-03',
+    title: '다른 프로젝트 03',
     summary: '준비 중 — 대상 확정 후 채웁니다.',
     badges: ['Soon'],
     tabs: [],

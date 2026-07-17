@@ -47,7 +47,7 @@ regline-hub/
 | 사이드 | 역할 | 주요 데이터 |
 |--------|------|-------------|
 | **Projects** | 완성·배포된 앱 카드 | `src/data/works.ts` |
-| **Works** | 진행 중 / 기록용 카드(한 줄 3개) + 아래 상세 패널 | `src/data/worksProjects.ts` |
+| **Works** | 왼쪽 카드 40% + 오른쪽 상세 패널 60% | `src/data/worksProjects.ts` |
 | **Links** | 외부 링크·메일·PDF | `src/data/links.ts` |
 
 Projects 섹션 예: FAQ 챗봇 · 챗봇 관리자 · LottoInsight · Docs · Profile  
@@ -59,21 +59,21 @@ Works 카드 예:
 | 챗봇/RAG 프로젝트 | 해당 README Raw | `chatbot-rag_CHANGELOG.md` |
 | **regline-hub** | 이 README | `regline-hub_CHANGELOG.md` |
 | 다른 프로젝트 02 | (준비 중) | — |
+| 다른 프로젝트 03 | (준비 중) | — |
 
 ---
 
 ## 3. Works 패널 동작 (확정)
 
 ```
-위: Works 카드 한 줄 3개 (원래 카드 크기)
-  [챗봇/RAG] [regline-hub] [다른 프로젝트 02]
-아래: 선택한 탭 패널 (전체 폭)
-  진행현황 → GitHub README.md
-  운영로그 → CHANGELOG 본문
+왼쪽 ~40%                         오른쪽 ~60%
+Works 카드 한 줄 4개               선택한 탭 패널
+[챗봇/RAG][regline-hub][…][…]      진행현황 → README
+                                   운영로그 → CHANGELOG
 ```
 
-- 페이지 이동 없음. 카드는 위에 유지, 아래 패널만 갱신
-- 카드 제목 = **프로젝트명** (CHANGELOG는 운영로그에 뜨는 문서 이름일 뿐)
+- 페이지 이동 없음. 카드는 왼쪽 유지, 오른쪽만 갱신
+- 카드 제목 = **프로젝트명**
 
 ---
 

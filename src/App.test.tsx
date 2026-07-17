@@ -44,8 +44,10 @@ describe('사이드 네비 · Works · Links', () => {
     expect(
       screen.getByText((_, el) => el?.classList.contains('works-split__empty') === true),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '챗봇/RAG 프로젝트' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'LangGraph-Agentic' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'regline-hub' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '다른 프로젝트 02' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '다른 프로젝트 03' })).toBeInTheDocument()
   })
 
   it('운영로그 클릭 시 카드는 유지되고 오른쪽에 CHANGELOG가 뜬다', async () => {
@@ -59,7 +61,9 @@ describe('사이드 네비 · Works · Links', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Works' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'regline-hub' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 2, name: '운영로그' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'regline-hub 운영로그' }),
+    ).toBeInTheDocument()
   })
 
   it('Works 사이드 재클릭 시 패널 선택이 해제된다', async () => {
@@ -68,10 +72,14 @@ describe('사이드 네비 · Works · Links', () => {
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
     await user.click(screen.getAllByRole('button', { name: '운영로그' })[0])
-    expect(screen.getByRole('heading', { level: 2, name: '운영로그' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'regline-hub 운영로그' }),
+    ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Works' }))
-    expect(screen.queryByRole('heading', { level: 2, name: '운영로그' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'regline-hub 운영로그' }),
+    ).not.toBeInTheDocument()
     expect(
       screen.getByText((_, el) => el?.classList.contains('works-split__empty') === true),
     ).toBeInTheDocument()

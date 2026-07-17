@@ -40,7 +40,8 @@ html,
 body,
 #root {
   margin: 0;
-  min-height: 100%;
+  height: 100%;
+  overflow: hidden; /* 페이지 전체 스크롤 금지 — 패널·메인 내부만 */
 }
 
 body {
@@ -50,14 +51,16 @@ body {
 }
 
 .shell {
-  min-height: 100vh;
+  height: 100%;
   display: flex;
+  overflow: hidden;
 }
 
 /* ---------- 얇은 왼쪽 바 ---------- */
 .shell__aside {
   width: var(--side-w);
   flex-shrink: 0;
+  height: 100%;
   background: var(--aside-bg);
   border-right: 1px solid var(--line);
   padding: 1rem 0.4rem;
@@ -69,7 +72,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 100%;
+  min-height: 0;
+  height: 100%;
 }
 
 .shell__side-link--settings {
@@ -172,15 +176,30 @@ body {
   position: relative;
   flex: 1;
   min-width: 0;
-  min-height: 100vh;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .shell__main {
   flex: 1;
   min-width: 0;
-  height: 100%;
+  min-height: 0;
   padding: 1.75rem 1.75rem 2rem;
-  overflow: auto;
+  overflow: auto; /* Projects/Links만 메인 스크롤 */
+}
+
+/* Works — 화면 스크롤 없음, 진행현황·운영로그 패널만 스크롤 */
+.shell__main--works {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.shell__main--works .shell__main-head {
+  flex-shrink: 0;
 }
 
 .shell__main-head {
@@ -786,35 +805,48 @@ body {
   align-items: stretch;
 }
 
-/* Works — 카드 한 줄 3개(원 크기) + 아래 상세 패널 */
+/* Works — 왼쪽 카드 40% / 오른쪽 상세 패널 60% */
 .works-split {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
   gap: 1.25rem;
   align-items: stretch;
+  flex: 1 1 auto;
   min-height: 0;
+  overflow: hidden;
 }
 
 .works-split__cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
   align-items: stretch;
+  align-content: start;
+  min-height: 0;
+  overflow: auto; /* 카드가 넘치면 왼쪽만 */
 }
 
 .works-split__panel {
-  position: static;
-  min-height: 18rem;
-  max-height: none;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #fafafa;
   padding: 1rem;
 }
 
+.works-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .works-split__empty {
-  margin: 1.25rem 0.5rem;
+  margin: 2rem 1rem;
   color: var(--muted);
   font-size: 0.95rem;
   line-height: 1.5;
@@ -825,32 +857,23 @@ body {
   flex-direction: column;
   gap: 0.35rem;
   margin-bottom: 0.85rem;
-}
-
-.works-panel__clear {
-  align-self: flex-start;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 0.85rem;
-  padding: 0;
-}
-
-.works-panel__clear:hover {
-  color: var(--ink);
-  text-decoration: underline;
+  padding: 0 0 0.85rem 1rem;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
 }
 
 .works-panel__title {
   margin: 0;
-  font-size: 1.15rem;
+}
+
+.works-panel__title-name {
+  font-size: 1.35rem;
   font-weight: 700;
 }
 
-.works-panel__subtitle {
-  margin: 0;
-  font-size: 0.85rem;
+.works-panel__title-tab {
+  font-size: 0.95rem;
+  font-weight: 500;
   color: var(--muted);
 }
 
@@ -858,6 +881,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-left: 2.5rem;
+  overflow-y: auto;
 }
 
 .readme-view {
@@ -886,13 +913,13 @@ body {
 .readme-view__p,
 .readme-view__table-row {
   margin: 0;
-  color: var(--muted);
+  color: var(--ink);
   white-space: pre-wrap;
 }
 
 .readme-view__li {
   margin-left: 1.1rem;
-  color: var(--muted);
+  color: var(--ink);
 }
 
 .readme-view__quote {
@@ -906,7 +933,18 @@ body {
   height: 0.35rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  .works-split {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .works-split__panel {
+    min-height: 40vh;
+  }
+}
+
+@media (max-width: 700px) {
   .works-split__cards {
     grid-template-columns: 1fr;
   }
@@ -995,6 +1033,16 @@ body {
 .works-card__tab:hover {
   background: #f0f2f5;
   color: var(--icon-violet-ink);
+}
+
+/* 오른쪽 패널에 현재 표시 중인 탭 강조 */
+.works-card__tab--active {
+  background: var(--icon-violet-bg);
+  color: var(--icon-violet-ink);
+}
+
+.works-card__tab--active:hover {
+  background: var(--icon-violet-bg);
 }
 
 .works-card__footer {
@@ -1114,38 +1162,83 @@ body {
   color: var(--muted);
 }
 
-/* ---------- CHANGELOG 본문 (운영로그 탭) ---------- */
-.changelog-view {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+/* ---------- CHANGELOG 본문 (운영로그 탭) — 타임라인형 ---------- */
+.ops-log-timeline {
+  position: relative;
+  max-width: 720px;
 }
 
-.changelog-view__section {
-  padding: 1rem 1.1rem;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
+/* 컨테이너 전체에 연속된 세로선 하나 — 아이템별로 이어붙이지 않음(누락 버그 방지) */
+.ops-log-timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #ddd;
+}
+
+.ops-log-item {
+  position: relative;
+  /* dot(9px, left:0) 오른쪽 끝(9px)에서 텍스트 시작까지 최소 16px 확보 → 25px */
+  padding-left: 25px;
+  margin-bottom: 24px;
+}
+
+.ops-log-item:last-child {
+  margin-bottom: 0;
+}
+
+.ops-log-dot {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  z-index: 1;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ccc;
+}
+
+/* 최신(첫 번째) 항목만 포인트 컬러(블루)로 강조 — 프로젝트 기존 blue 변수 재사용 */
+.ops-log-dot--latest {
+  background: var(--icon-blue-ink);
 }
 
 .changelog-view__date {
-  margin: 0 0 0.75rem;
-  font-size: 1rem;
-  font-weight: 700;
+  margin: 0 0 6px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.ops-log-date {
+  font-weight: 500;
+  font-size: 16px;
   color: var(--ink);
+}
+
+.ops-log-version {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .changelog-view__body {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  font-size: 0.88rem;
-  line-height: 1.55;
+  gap: 6px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .changelog-view__line {
   margin: 0;
   color: var(--muted);
+}
+
+.changelog-view__line--summary {
+  color: var(--ink);
 }
 
 .changelog-view__line strong {
@@ -1155,7 +1248,39 @@ body {
 .changelog-view__list {
   margin: 0.15rem 0 0;
   padding-left: 1.15rem;
+  font-size: 14px;
   color: var(--muted);
+}
+
+.ops-log-files {
+  margin-top: 2px;
+}
+
+.ops-log-files__summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+  user-select: none;
+}
+
+.ops-log-files__summary:hover {
+  color: var(--ink);
+}
+
+.ops-log-files__list {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.ops-log-file-pill {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 12px;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-text);
 }
 
 /* ---------- Links 리스트 (카드 아님) ---------- */
