@@ -67,73 +67,20 @@
 <body>
   <div class="container">
     <h1>예산회계 MSA 전환 시스템</h1>
-
-    <h2>예산 편성 등록</h2>
     <p class="section-lead">
-      예산 편성이란 조직(국가, 지방자치단체, 기업 등)이 차기 회계연도의 목표를 달성하기 위해 필요한 재원을 미리 예측하고, 이를 어디에 얼마나 쓸지 계획을 세워 확정하는 일련의 과정을 의미합니다.
+      공공 예산회계 시스템을 KT 공공클라우드·Kubernetes 기반으로 재설계한 MSA 전환 프로젝트입니다.
+      업무기능 단위로 서비스를 분해하고, 트래픽 특성에 맞춘 오토스케일링 구조까지 설계·구축했습니다.
+    </p>
+
+    <h2>인프라 아키텍처 (KT 공공클라우드 · Kubernetes)</h2>
+    <p class="section-lead">
+        KT 공공 클라우드 K8s 기반 네트워크 및 HW 구성도
     </p>
     <figure class="budget-source-figure">
-      <img src="img/bud.jpg" alt="예산 편성 화면 캡처" loading="lazy" decoding="async">
+      <img src="img/sys.jpg" alt="KT 공공클라우드 K8s 인프라 구성도" loading="lazy" decoding="async">
     </figure>
 
-    <div class="info-box">
-      <strong>분기 규칙:</strong> 좌측 ① 예산차수등록과 ② 예산차수등록(요구조정) 경로는 <strong>둘 중 하나만</strong> 진행합니다.
-    </div>
-    <figure class="budget-source-figure">
-      <img src="img/bud2.jpg" alt="예산 프로세스 절차 요약 도식" loading="lazy" decoding="async">
-    </figure>
-
-    <h2>지출 품의 등록</h2>
-    <p class="section-lead">
-      지출원인행위, 지출, 지급의 단계를 거쳐 예산을 집행하며, 이를 증빙하기 위해 지출결의서를 사용합니다.
-    </p>
-    <figure class="budget-source-figure">
-      <img src="img/exp.jpg" alt="지출 품의 화면 캡처" loading="lazy" decoding="async">
-    </figure>
-    <figure class="budget-source-figure">
-      <img src="img/exp_pro.jpg" alt="지출 프로세스 절차 도식" loading="lazy" decoding="async">
-    </figure>
-
-    <h2>수입결의 등록</h2>
-    <p class="section-lead">
-      <strong>「누구에게, 왜, 언제까지, 얼마를 받아야 하는지」</strong>를 검토하여 기관장의 승인을 받는 절차입니다.
-    </p>
-    <p class="section-lead">
-      예: 공공 시설 대관료 10만 원을 받을 일이 생겼을 때, 「A업체에게 10만 원을 받아야 함」이라고 시스템에 등록하고 고지서를 발행하는 행위 자체가 수입결의의 핵심입니다.
-    </p>
-    <figure class="budget-source-figure">
-      <img src="img/inc.jpg" alt="수입결의 화면 캡처" loading="lazy" decoding="async">
-    </figure>
-
-    <h2>고정자산 대장</h2>
-    <p class="section-lead">자산 = 부채(빌린 돈) + 자본(내 돈)</p>
-    <p class="section-lead">
-      즉, 현재 우리 기관이 보유한 모든 자산은 누군가에게 빌렸거나(부채), 처음부터 우리 소유(자본)였던 것들의 합계입니다.
-    </p>
-    <figure class="budget-source-figure">
-      <img src="img/acc.jpg" alt="고정자산 대장 화면 캡처" loading="lazy" decoding="async">
-    </figure>
-
-    <h2>계약 등록</h2>
-    <p class="section-lead">
-      서로의 의무와 권리를 명확히 하기 위해 맺는 법적인 약속을 의미합니다.
-    </p>
-    <p class="section-lead">
-      돈을 쓸 근거(지출원인행위)나 돈을 받을 근거(수입원인행위)를 확정하는 행위입니다.
-    </p>
-    <figure class="budget-source-figure">
-      <img src="img/cont.jpg" alt="계약 등록 화면 캡처" loading="lazy" decoding="async">
-    </figure>
-
-    <h2>시스템 구성도  </h2>
-    <p class="section-lead">
-        kt 공공 클라우드 k8s 네트워크 및 HW 구성도
-    </p>
-    <figure class="budget-source-figure">
-      <img src="img/sys.jpg" alt="HPA 스케일링 개념 도식" loading="lazy" decoding="async">
-    </figure>
-
-    <h2>예산회계 MSA 전환 — 단계별 아키텍처</h2>
+    <h2>MSA 전환 아키텍처</h2>
     <p class="section-lead">
       애플리케이션을 업무기능 단위로 분해하고, 변화가 적은 업무는 기존 아키텍처를 유지한 채 단계적으로 전환·개발합니다.
     </p>
@@ -141,7 +88,7 @@
       <img src="img/msa.jpg" alt="예산회계 MSA 전환 아키텍처 도식" loading="lazy" decoding="async">
     </figure>
 
-    <h2>HPA 스케일링</h2>
+    <h2>오토스케일링 설계 (HPA)</h2>
     <p class="section-lead">
       HPA(Horizontal Pod Autoscaler)는 부하 증가에 따라 <strong>파드(복제) 수를 늘리는</strong> 수평 확장을 뜻합니다.
     </p>
@@ -152,7 +99,68 @@
       <img src="img/hpa.jpg" alt="HPA 스케일링 개념 도식" loading="lazy" decoding="async">
     </figure>
 
-    
+    <details open style="margin-top: 32px;">
+      <summary style="cursor:pointer; font-size:1.15rem; color:#555; font-weight:bold; padding:8px 0;">
+        참고: 도메인 업무 기능 상세 (예산 편성 · 지출 · 수입 · 자산 · 계약)
+      </summary>
+
+      <h2>예산 편성 등록</h2>
+      <p class="section-lead">
+        예산 편성이란 조직(국가, 지방자치단체, 기업 등)이 차기 회계연도의 목표를 달성하기 위해 필요한 재원을 미리 예측하고, 이를 어디에 얼마나 쓸지 계획을 세워 확정하는 일련의 과정을 의미합니다.
+      </p>
+      <figure class="budget-source-figure">
+        <img src="img/bud.jpg" alt="예산 편성 화면 캡처" loading="lazy" decoding="async">
+      </figure>
+
+      <div class="info-box">
+        <strong>분기 규칙:</strong> 좌측 ① 예산차수등록과 ② 예산차수등록(요구조정) 경로는 <strong>둘 중 하나만</strong> 진행합니다.
+      </div>
+      <figure class="budget-source-figure">
+        <img src="img/bud2.jpg" alt="예산 프로세스 절차 요약 도식" loading="lazy" decoding="async">
+      </figure>
+
+      <h2>지출 품의 등록</h2>
+      <p class="section-lead">
+        지출원인행위, 지출, 지급의 단계를 거쳐 예산을 집행하며, 이를 증빙하기 위해 지출결의서를 사용합니다.
+      </p>
+      <figure class="budget-source-figure">
+        <img src="img/exp.jpg" alt="지출 품의 화면 캡처" loading="lazy" decoding="async">
+      </figure>
+      <figure class="budget-source-figure">
+        <img src="img/exp_pro.jpg" alt="지출 프로세스 절차 도식" loading="lazy" decoding="async">
+      </figure>
+
+      <h2>수입결의 등록</h2>
+      <p class="section-lead">
+        <strong>「누구에게, 왜, 언제까지, 얼마를 받아야 하는지」</strong>를 검토하여 기관장의 승인을 받는 절차입니다.
+      </p>
+      <p class="section-lead">
+        예: 공공 시설 대관료 10만 원을 받을 일이 생겼을 때, 「A업체에게 10만 원을 받아야 함」이라고 시스템에 등록하고 고지서를 발행하는 행위 자체가 수입결의의 핵심입니다.
+      </p>
+      <figure class="budget-source-figure">
+        <img src="img/inc.jpg" alt="수입결의 화면 캡처" loading="lazy" decoding="async">
+      </figure>
+
+      <h2>고정자산 대장</h2>
+      <p class="section-lead">자산 = 부채(빌린 돈) + 자본(내 돈)</p>
+      <p class="section-lead">
+        즉, 현재 우리 기관이 보유한 모든 자산은 누군가에게 빌렸거나(부채), 처음부터 우리 소유(자본)였던 것들의 합계입니다.
+      </p>
+      <figure class="budget-source-figure">
+        <img src="img/acc.jpg" alt="고정자산 대장 화면 캡처" loading="lazy" decoding="async">
+      </figure>
+
+      <h2>계약 등록</h2>
+      <p class="section-lead">
+        서로의 의무와 권리를 명확히 하기 위해 맺는 법적인 약속을 의미합니다.
+      </p>
+      <p class="section-lead">
+        돈을 쓸 근거(지출원인행위)나 돈을 받을 근거(수입원인행위)를 확정하는 행위입니다.
+      </p>
+      <figure class="budget-source-figure">
+        <img src="img/cont.jpg" alt="계약 등록 화면 캡처" loading="lazy" decoding="async">
+      </figure>
+    </details>
 
   </div>
 </body>

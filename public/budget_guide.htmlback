@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>예산회계 MSA 전환 시스템 (2026-04-23)</title>
+  <style>
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #555;
+      margin-top: 28px;
+      border-left: 4px solid #4CAF50;
+      padding-left: 12px;
+      font-size: 1.15rem;
+    }
+    h2:first-of-type {
+      margin-top: 20px;
+    }
+    /* 본문 도입 문단 */
+    .section-lead {
+      line-height: 1.75;
+      color: #444;
+      margin: 12px 0 16px;
+      max-width: 920px;
+    }
+    .info-box {
+      background: #ffebee;
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin: 16px 0;
+      border-left: 4px solid #c62828;
+      color: #b71c1c;
+      line-height: 1.6;
+    }
+    .budget-source-figure {
+      margin: 16px 0 24px;
+      text-align: center;
+      background: #fafafa;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    .budget-source-figure img {
+      max-width: 100%;
+      height: auto;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>예산회계 MSA 전환 시스템</h1>
+
+    <h2>예산 편성 등록</h2>
+    <p class="section-lead">
+      예산 편성이란 조직(국가, 지방자치단체, 기업 등)이 차기 회계연도의 목표를 달성하기 위해 필요한 재원을 미리 예측하고, 이를 어디에 얼마나 쓸지 계획을 세워 확정하는 일련의 과정을 의미합니다.
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/bud.jpg" alt="예산 편성 화면 캡처" loading="lazy" decoding="async">
+    </figure>
+
+    <div class="info-box">
+      <strong>분기 규칙:</strong> 좌측 ① 예산차수등록과 ② 예산차수등록(요구조정) 경로는 <strong>둘 중 하나만</strong> 진행합니다.
+    </div>
+    <figure class="budget-source-figure">
+      <img src="img/bud2.jpg" alt="예산 프로세스 절차 요약 도식" loading="lazy" decoding="async">
+    </figure>
+
+    <h2>지출 품의 등록</h2>
+    <p class="section-lead">
+      지출원인행위, 지출, 지급의 단계를 거쳐 예산을 집행하며, 이를 증빙하기 위해 지출결의서를 사용합니다.
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/exp.jpg" alt="지출 품의 화면 캡처" loading="lazy" decoding="async">
+    </figure>
+    <figure class="budget-source-figure">
+      <img src="img/exp_pro.jpg" alt="지출 프로세스 절차 도식" loading="lazy" decoding="async">
+    </figure>
+
+    <h2>수입결의 등록</h2>
+    <p class="section-lead">
+      <strong>「누구에게, 왜, 언제까지, 얼마를 받아야 하는지」</strong>를 검토하여 기관장의 승인을 받는 절차입니다.
+    </p>
+    <p class="section-lead">
+      예: 공공 시설 대관료 10만 원을 받을 일이 생겼을 때, 「A업체에게 10만 원을 받아야 함」이라고 시스템에 등록하고 고지서를 발행하는 행위 자체가 수입결의의 핵심입니다.
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/inc.jpg" alt="수입결의 화면 캡처" loading="lazy" decoding="async">
+    </figure>
+
+    <h2>고정자산 대장</h2>
+    <p class="section-lead">자산 = 부채(빌린 돈) + 자본(내 돈)</p>
+    <p class="section-lead">
+      즉, 현재 우리 기관이 보유한 모든 자산은 누군가에게 빌렸거나(부채), 처음부터 우리 소유(자본)였던 것들의 합계입니다.
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/acc.jpg" alt="고정자산 대장 화면 캡처" loading="lazy" decoding="async">
+    </figure>
+
+    <h2>계약 등록</h2>
+    <p class="section-lead">
+      서로의 의무와 권리를 명확히 하기 위해 맺는 법적인 약속을 의미합니다.
+    </p>
+    <p class="section-lead">
+      돈을 쓸 근거(지출원인행위)나 돈을 받을 근거(수입원인행위)를 확정하는 행위입니다.
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/cont.jpg" alt="계약 등록 화면 캡처" loading="lazy" decoding="async">
+    </figure>
+
+    <h2>시스템 구성도  </h2>
+    <p class="section-lead">
+        kt 공공 클라우드 k8s 네트워크 및 HW 구성도
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/sys.jpg" alt="HPA 스케일링 개념 도식" loading="lazy" decoding="async">
+    </figure>
+
+    <h2>예산회계 MSA 전환 — 단계별 아키텍처</h2>
+    <p class="section-lead">
+      애플리케이션을 업무기능 단위로 분해하고, 변화가 적은 업무는 기존 아키텍처를 유지한 채 단계적으로 전환·개발합니다.
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/msa.jpg" alt="예산회계 MSA 전환 아키텍처 도식" loading="lazy" decoding="async">
+    </figure>
+
+    <h2>HPA 스케일링</h2>
+    <p class="section-lead">
+      HPA(Horizontal Pod Autoscaler)는 부하 증가에 따라 <strong>파드(복제) 수를 늘리는</strong> 수평 확장을 뜻합니다.
+    </p>
+    <p class="section-lead">
+      이미 떠 있는 파드에 CPU·메모리만 더 주는 방식(VPA 등)과는 목적이 다릅니다.
+    </p>
+    <figure class="budget-source-figure">
+      <img src="img/hpa.jpg" alt="HPA 스케일링 개념 도식" loading="lazy" decoding="async">
+    </figure>
+
+    
+
+  </div>
+</body>
+</html>
