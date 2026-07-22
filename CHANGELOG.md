@@ -12,7 +12,7 @@
 **변경 내용**: Projects → LangGraph-Agentic RAG 카드에 PDF 모드 사용법·검색 예시를 보여 줌
 
 - 파란 `Chat with us` 타이틀 유지, **PDF** 배지 깜빡임
-- 본문 텍스트: ① 상단 헤더에서 PDF 선택 → ② LLM(어떤컬렉션)·규칙라우팅·Agent, 이솝·ARKK 2개 벡터DB, 예) 질문·전체 목록 검색
+- 본문 텍스트: ① 상단 헤더에서 PDF 선택 → ② LLM판단·라우터·Agent, 이솝·ARKK 2개 벡터DB, 예) 질문·전체 목록 검색
 - 카드 요약: `Agent가 질문을 판단해 이솝·ARKK 벡터DB중 컬렉션으로 연결`
 
 ---

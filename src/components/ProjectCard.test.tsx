@@ -46,7 +46,7 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(screen.getByText('Chat with us')).toBeInTheDocument()
     expect(screen.getByText('PDF')).toBeInTheDocument()
     expect(screen.getByText('① 상단 헤더에서 PDF 선택')).toBeInTheDocument()
-    expect(screen.getByText('② 질문→LLM(어떤컬렉션)→규칙라우팅→Agent')).toBeInTheDocument()
+    expect(screen.getByText('② 질문→LLM판단→라우터→Agent')).toBeInTheDocument()
     expect(screen.getByText('· 이솝우화, ARKK 보고서 2개의 벡터DB')).toBeInTheDocument()
     expect(screen.getByText(/늑대와 어린양 한마디 결론은/)).toBeInTheDocument()
     expect(screen.getByText(/전체 목록/)).toBeInTheDocument()
