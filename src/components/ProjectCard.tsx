@@ -101,7 +101,7 @@ function ProjectCardBody({ card }: { card: WorkCard }): ReactNode {
   )
 }
 
-/** agentic-rag 카드 전용 — chatbot-ui PDF 모드 정적 목업 */
+/** agentic-rag 카드 전용 — chatbot-ui PDF 모드 안내(텍스트) + PDF 깜빡임 */
 function AgenticRagThumbnail() {
   return (
     <div className="agentic-thumbnail" aria-hidden="true">
@@ -110,12 +110,11 @@ function AgenticRagThumbnail() {
         <span className="agentic-thumbnail__mode">PDF</span>
       </div>
       <div className="agentic-thumbnail__body">
-        <ul className="agentic-thumbnail__sources">
-          <li>이솝우화</li>
-          <li>ARKK 주식보고서</li>
-        </ul>
-        <p className="agentic-thumbnail__chat">채팅 : 전체 목록 후 관련 검색하시면</p>
-        <p className="agentic-thumbnail__flow">질문→LLM판단→규칙라우터→Agent</p>
+        <p className="agentic-thumbnail__line">① 상단 헤더에서 PDF 선택</p>
+        <p className="agentic-thumbnail__line">② 질문→LLM판단→라우팅</p>
+        <p className="agentic-thumbnail__sources">· 이솝우화, ARKK 보고서</p>
+        <p className="agentic-thumbnail__example">예) &quot;늑대와 어린양 한마디 결론은&quot;</p>
+        <p className="agentic-thumbnail__example">예) &quot;전체 목록&quot; 검색</p>
       </div>
     </div>
   )

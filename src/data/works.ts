@@ -40,7 +40,7 @@ export const WORK_CARDS: WorkCard[] = [
   {
     id: 'agentic-rag',
     title: 'LangGraph-Agentic RAG',
-    summary: '로드→청킹→벡터화→LLM 판단 Agentic',
+    summary: '로드 청킹 벡터화 << 질문→LLM판단→규칙라우터→Agent',
     badges: ['Owner', 'Live'],
     actionLabel: 'CHANGELOG.md',
     href: '#',

@@ -15,7 +15,7 @@ const sampleCard: WorkCard = {
 const agenticCard: WorkCard = {
   id: 'agentic-rag',
   title: 'LangGraph-Agentic RAG',
-  summary: '로드→청킹→벡터화→LLM 판단 Agentic',
+  summary: '로드 청킹 벡터화 << 질문→LLM판단→규칙라우터→Agent',
   badges: ['Owner', 'Live'],
   actionLabel: 'CHANGELOG.md',
   href: '#',
@@ -36,7 +36,7 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(link).toContainElement(screen.getByRole('heading', { name: 'faq-chatbot' }))
   })
 
-  it('Agentic 카드는 PDF 모드 목업이며 Works CHANGELOG로 이동한다', () => {
+  it('Agentic 카드는 PDF 안내·검색 예시와 Works CHANGELOG로 이동한다', () => {
     const onHubNavigate = vi.fn()
     render(<ProjectCard card={agenticCard} onHubNavigate={onHubNavigate} />)
 
@@ -45,10 +45,14 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(screen.getByText('Live')).toBeInTheDocument()
     expect(screen.getByText('Chat with us')).toBeInTheDocument()
     expect(screen.getByText('PDF')).toBeInTheDocument()
-    expect(screen.getByText('이솝우화')).toBeInTheDocument()
-    expect(screen.getByText('ARKK 주식보고서')).toBeInTheDocument()
-    expect(screen.getByText('채팅 : 전체 목록 후 관련 검색하시면')).toBeInTheDocument()
-    expect(screen.getByText('질문→LLM판단→규칙라우터→Agent')).toBeInTheDocument()
+    expect(screen.getByText('① 상단 헤더에서 PDF 선택')).toBeInTheDocument()
+    expect(screen.getByText('② 질문→LLM판단→라우팅')).toBeInTheDocument()
+    expect(screen.getByText('· 이솝우화, ARKK 보고서')).toBeInTheDocument()
+    expect(screen.getByText(/늑대와 어린양 한마디 결론은/)).toBeInTheDocument()
+    expect(screen.getByText(/전체 목록/)).toBeInTheDocument()
+    expect(
+      screen.getByText('로드 청킹 벡터화 << 질문→LLM판단→규칙라우터→Agent'),
+    ).toBeInTheDocument()
 
     button.click()
     expect(onHubNavigate).toHaveBeenCalledWith({

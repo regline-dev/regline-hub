@@ -648,7 +648,7 @@ body {
   color: var(--icon-rose-ink);
 }
 
-/* agentic-rag 카드 전용 — chatbot-ui PDF 모드 정적 목업 */
+/* agentic-rag 카드 전용 — PDF 모드 텍스트 안내 + PDF 배지 깜빡임 */
 .agentic-thumbnail {
   height: 140px;
   border-radius: 6px;
@@ -684,6 +684,17 @@ body {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.04em;
+  animation: agentic-pdf-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes agentic-pdf-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
 }
 
 .agentic-thumbnail__body {
@@ -691,54 +702,33 @@ body {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.45rem 0.5rem 0.4rem;
+  gap: 0.18rem;
+  padding: 0.4rem 0.5rem 0.35rem;
   background: #f1f2f4;
+  color: #1a1f26;
+}
+
+.agentic-thumbnail__line {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .agentic-thumbnail__sources {
   margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.agentic-thumbnail__sources li {
-  padding: 3px 7px;
-  border-radius: 4px;
-  background: #fff;
-  color: #1a1f26;
-  font-size: 9px;
-  font-weight: 600;
-  line-height: 1.3;
-  box-shadow: 0 0 0 1px #d8dce2;
-}
-
-.agentic-thumbnail__chat {
-  margin: 0;
-  padding: 5px 8px;
-  border-radius: 8px;
-  background: #fff;
-  color: #1a1f26;
-  font-size: 9px;
-  line-height: 1.35;
-  align-self: flex-start;
-  max-width: 100%;
-}
-
-.agentic-thumbnail__flow {
-  margin: auto 0 0;
-  padding: 0;
-  color: #5c6570;
+  padding-left: 0.55rem;
   font-size: 8px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: 500;
+  color: #5c6570;
   line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.agentic-thumbnail__example {
+  margin: 0;
+  font-size: 8.5px;
+  line-height: 1.35;
+  color: #0c447c;
 }
 
 .project-card__footer {

@@ -7,12 +7,13 @@
 
 ## 2026-07-22 (v4)
 
-**변경 파일**: src/components/ProjectCard.tsx, src/styles.css, src/components/ProjectCard.test.tsx
+**변경 파일**: src/components/ProjectCard.tsx, src/styles.css, src/data/works.ts, src/components/ProjectCard.test.tsx
 
-**변경 내용**: Projects → LangGraph-Agentic RAG 카드 썸네일을 chatbot-ui PDF 모드 안내 목업으로 표시
+**변경 내용**: Projects → LangGraph-Agentic RAG 카드에 PDF 모드 사용법·검색 예시를 보여 줌
 
-- `Chat with us` + PDF 선택, 이솝우화·ARKK 주식보고서, 채팅 안내·Agent 흐름 문구
-- 정적 미니 UI (FAQ 카드와 같은 채팅 헤더 톤)
+- 파란 `Chat with us` 타이틀 유지, **PDF** 배지 깜빡임
+- 본문 텍스트: ① 상단 헤더에서 PDF 선택 → ② 라우팅, 문서(이솝·ARKK), 예) 질문·전체 목록 검색
+- 카드 요약: `로드 청킹 벡터화 << 질문→LLM판단→규칙라우터→Agent`
 
 ---
 
