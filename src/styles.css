@@ -710,7 +710,7 @@ body {
 
 .agentic-thumbnail__line {
   margin: 0;
-  font-size: 9px;
+  font-size: calc(9px + 0.5px);
   font-weight: 600;
   line-height: 1.35;
 }
@@ -718,7 +718,7 @@ body {
 .agentic-thumbnail__sources {
   margin: 0;
   padding-left: 0.55rem;
-  font-size: 8px;
+  font-size: calc(8px + 0.5px);
   font-weight: 500;
   color: #5c6570;
   line-height: 1.3;
@@ -726,7 +726,7 @@ body {
 
 .agentic-thumbnail__example {
   margin: 0;
-  font-size: 8.5px;
+  font-size: calc(8.5px + 0.5px);
   line-height: 1.35;
   color: #0c447c;
 }

@@ -15,7 +15,7 @@ const sampleCard: WorkCard = {
 const agenticCard: WorkCard = {
   id: 'agentic-rag',
   title: 'LangGraph-Agentic RAG',
-  summary: '질문→LLM판단→규칙라우터→Agent',
+  summary: 'Agent가 질문을 판단해 이솝·ARKK 벡터DB중 컬렉션으로 연결',
   badges: ['Owner', 'Live'],
   actionLabel: 'CHANGELOG.md',
   href: '#',
@@ -50,7 +50,9 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(screen.getByText('· 이솝우화, ARKK 보고서 2개의 벡터DB')).toBeInTheDocument()
     expect(screen.getByText(/늑대와 어린양 한마디 결론은/)).toBeInTheDocument()
     expect(screen.getByText(/전체 목록/)).toBeInTheDocument()
-    expect(screen.getByText('질문→LLM판단→규칙라우터→Agent')).toBeInTheDocument()
+    expect(
+      screen.getByText('Agent가 질문을 판단해 이솝·ARKK 벡터DB중 컬렉션으로 연결'),
+    ).toBeInTheDocument()
 
     button.click()
     expect(onHubNavigate).toHaveBeenCalledWith({
