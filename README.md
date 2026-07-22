@@ -109,6 +109,7 @@ npm run build      # dist/ → Vercel Output
 |------|-----|
 | Framework | Vite + React + TypeScript |
 | 배포 | GitHub `main` push → Vercel 자동 |
+| 방문자 | Vercel Web Analytics (`@vercel/analytics`) — 프로젝트 대시보드 **Analytics** 탭 |
 | ~~Hetzner `:3003` Docker~~ | 이전 호스팅 — 현재 주 경로 아님 |
 
 ---

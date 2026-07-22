@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { LinksPanel } from './components/LinksPanel'
 import { ProjectCard } from './components/ProjectCard'
 import { WorksCard } from './components/WorksCard'
@@ -189,6 +190,8 @@ export function App({ cards }: AppProps) {
           </div>
         )}
       </div>
+      {/* 방문자·페이지뷰 집계 (Vercel Web Analytics) */}
+      <Analytics />
     </div>
   )
 }

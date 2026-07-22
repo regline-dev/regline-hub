@@ -4,6 +4,11 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { App } from './App'
 import { WORK_CARDS, resolveHubUrls } from './data/works'
 
+// Vercel Analytics는 테스트에서 마운트 여부만 확인
+vi.mock('@vercel/analytics/react', () => ({
+  Analytics: () => <div data-testid="vercel-analytics" />,
+}))
+
 function renderHub() {
   const cards = resolveHubUrls(WORK_CARDS, 'example.com')
   return render(<App cards={cards} />)
@@ -29,6 +34,11 @@ describe('App 셸 레이아웃', () => {
     expect(screen.getByRole('navigation', { name: '사이드 메뉴' })).toBeInTheDocument()
     expect(screen.getByRole('main')).toBeInTheDocument()
     expect(screen.queryByRole('banner')).not.toBeInTheDocument()
+  })
+
+  it('Vercel Analytics 컴포넌트를 마운트한다', () => {
+    renderHub()
+    expect(screen.getByTestId('vercel-analytics')).toBeInTheDocument()
   })
 })
 

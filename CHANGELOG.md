@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-07-22 (v1)
+
+**변경 파일**: Docs/20260722_regline-hub_VercelAnalytics_계획.md, src/App.tsx, src/App.test.tsx, package.json, README.md
+
+**변경 내용**: Phase 1 — 허브 Production에 Vercel Web Analytics로 방문자·페이지뷰 집계
+
+- `@vercel/analytics` + `<Analytics />`로 사이트 접속이 대시보드에 쌓이게 함
+- 내 IP 제외·자체 DB는 비범위 — Vercel 프로젝트 Analytics 탭에서 확인
+- 운영: 대시보드에서 Web Analytics Enable 후 main 배포 반영 필요
+
+---
+
 ## 2026-07-17 (v5)
 
 **변경 파일**: src/data/fetchRawText.ts, src/data/fetchRawText.test.ts

@@ -11,7 +11,9 @@ describe('fetchChangelogOps', () => {
 
     const entries = await fetchChangelogOps('https://example.test/changelog.md', fetchImpl)
     expect(entries).toEqual([{ date: '20260717', text: 'Vercel 배포' }])
-    expect(fetchImpl).toHaveBeenCalledWith('https://example.test/changelog.md')
+    expect(fetchImpl).toHaveBeenCalledWith('https://example.test/changelog.md', {
+      cache: 'no-store',
+    })
   })
 
   it('HTTP 실패 시 에러를 던진다', async () => {
