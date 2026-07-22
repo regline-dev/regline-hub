@@ -648,20 +648,97 @@ body {
   color: var(--icon-rose-ink);
 }
 
-/* agentic-rag 카드 전용 — CHANGELOG 링크 안내 (점선 배경 유지) */
+/* agentic-rag 카드 전용 — chatbot-ui PDF 모드 정적 목업 */
 .agentic-thumbnail {
   height: 140px;
   border-radius: 6px;
-  border: 1.5px dashed #c7cad0;
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  box-shadow: 0 1px 2px rgba(26, 31, 38, 0.15);
 }
 
-.agentic-thumbnail__label {
-  font-size: 12px;
+.agentic-thumbnail__header {
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0 0.55rem;
+  background: #2f7ed8;
+  color: #fff;
+}
+
+.agentic-thumbnail__title {
+  font-size: 0.72rem;
   font-weight: 600;
-  color: #9aa0a8;
+  white-space: nowrap;
+}
+
+.agentic-thumbnail__mode {
+  flex-shrink: 0;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.agentic-thumbnail__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.45rem 0.5rem 0.4rem;
+  background: #f1f2f4;
+}
+
+.agentic-thumbnail__sources {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.agentic-thumbnail__sources li {
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: #fff;
+  color: #1a1f26;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.3;
+  box-shadow: 0 0 0 1px #d8dce2;
+}
+
+.agentic-thumbnail__chat {
+  margin: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a1f26;
+  font-size: 9px;
+  line-height: 1.35;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.agentic-thumbnail__flow {
+  margin: auto 0 0;
+  padding: 0;
+  color: #5c6570;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .project-card__footer {

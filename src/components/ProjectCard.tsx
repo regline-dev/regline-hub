@@ -101,12 +101,22 @@ function ProjectCardBody({ card }: { card: WorkCard }): ReactNode {
   )
 }
 
-/** 문서/페이지 아이콘 — 접힌 모서리 + 텍스트 줄, DocThumbnail·ProfileThumbnail 공용 */
-/** agentic-rag 카드 전용 — CHANGELOG 링크 안내 (기존 점선 배경 유지) */
+/** agentic-rag 카드 전용 — chatbot-ui PDF 모드 정적 목업 */
 function AgenticRagThumbnail() {
   return (
     <div className="agentic-thumbnail" aria-hidden="true">
-      <span className="agentic-thumbnail__label">CHANGELOG.md</span>
+      <div className="agentic-thumbnail__header">
+        <span className="agentic-thumbnail__title">Chat with us</span>
+        <span className="agentic-thumbnail__mode">PDF</span>
+      </div>
+      <div className="agentic-thumbnail__body">
+        <ul className="agentic-thumbnail__sources">
+          <li>이솝우화</li>
+          <li>ARKK 주식보고서</li>
+        </ul>
+        <p className="agentic-thumbnail__chat">채팅 : 전체 목록 후 관련 검색하시면</p>
+        <p className="agentic-thumbnail__flow">질문→LLM판단→규칙라우터→Agent</p>
+      </div>
     </div>
   )
 }

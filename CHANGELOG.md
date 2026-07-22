@@ -5,6 +5,27 @@
 
 ---
 
+## 2026-07-22 (v4)
+
+**변경 파일**: src/components/ProjectCard.tsx, src/styles.css, src/components/ProjectCard.test.tsx
+
+**변경 내용**: Projects → LangGraph-Agentic RAG 카드 썸네일을 chatbot-ui PDF 모드 안내 목업으로 표시
+
+- `Chat with us` + PDF 선택, 이솝우화·ARKK 주식보고서, 채팅 안내·Agent 흐름 문구
+- 정적 미니 UI (FAQ 카드와 같은 채팅 헤더 톤)
+
+---
+
+## 2026-07-22 (v3)
+
+**변경 파일**: src/data/works.ts, src/components/ProjectCard.test.tsx
+
+**변경 내용**: Projects → LangGraph-Agentic RAG 카드를 다른 Live 카드와 같은 일반 배경으로 표시
+
+- Hetzner 배포 반영 — `disabled`(회색) 해제, 배지 `Live`
+
+---
+
 ## 2026-07-22 (v2)
 
 **변경 파일**: Docs/20260722_regline-hub_방문카운터JSON_계획.md, api/visit.js, src/components/VisitStatsBadge.tsx, src/data/visitCounter.ts, src/App.tsx, src/styles.css, README.md

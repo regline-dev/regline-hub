@@ -16,10 +16,9 @@ const agenticCard: WorkCard = {
   id: 'agentic-rag',
   title: 'LangGraph-Agentic RAG',
   summary: '로드→청킹→벡터화→LLM 판단 Agentic',
-  badges: ['Owner', 'In Progress'],
+  badges: ['Owner', 'Live'],
   actionLabel: 'CHANGELOG.md',
   href: '#',
-  disabled: true,
   hubTarget: { projectId: 'langgraph-agentic-backend', tab: 'ops' },
 }
 
@@ -37,13 +36,19 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(link).toContainElement(screen.getByRole('heading', { name: 'faq-chatbot' }))
   })
 
-  it('Agentic 카드는 흐린 배경을 유지하고 Works CHANGELOG로 이동한다', () => {
+  it('Agentic 카드는 PDF 모드 목업이며 Works CHANGELOG로 이동한다', () => {
     const onHubNavigate = vi.fn()
     render(<ProjectCard card={agenticCard} onHubNavigate={onHubNavigate} />)
 
     const button = screen.getByRole('button', { name: /CHANGELOG\.md/i })
-    expect(button).toHaveClass('project-card--disabled')
-    expect(screen.getByText('로드→청킹→벡터화→LLM 판단 Agentic')).toBeInTheDocument()
+    expect(button).not.toHaveClass('project-card--disabled')
+    expect(screen.getByText('Live')).toBeInTheDocument()
+    expect(screen.getByText('Chat with us')).toBeInTheDocument()
+    expect(screen.getByText('PDF')).toBeInTheDocument()
+    expect(screen.getByText('이솝우화')).toBeInTheDocument()
+    expect(screen.getByText('ARKK 주식보고서')).toBeInTheDocument()
+    expect(screen.getByText('채팅 : 전체 목록 후 관련 검색하시면')).toBeInTheDocument()
+    expect(screen.getByText('질문→LLM판단→규칙라우터→Agent')).toBeInTheDocument()
 
     button.click()
     expect(onHubNavigate).toHaveBeenCalledWith({

@@ -41,10 +41,9 @@ export const WORK_CARDS: WorkCard[] = [
     id: 'agentic-rag',
     title: 'LangGraph-Agentic RAG',
     summary: '로드→청킹→벡터화→LLM 판단 Agentic',
-    badges: ['Owner', 'In Progress'],
+    badges: ['Owner', 'Live'],
     actionLabel: 'CHANGELOG.md',
     href: '#',
-    disabled: true,
     // Projects → Works → LangGraph-Agentic → CHANGELOG.md
     hubTarget: { projectId: 'langgraph-agentic-backend', tab: 'ops' },
   },
