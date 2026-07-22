@@ -15,7 +15,7 @@ const sampleCard: WorkCard = {
 const agenticCard: WorkCard = {
   id: 'agentic-rag',
   title: 'LangGraph-Agentic RAG',
-  summary: '로드 청킹 벡터화 << 질문→LLM판단→규칙라우터→Agent',
+  summary: '질문→LLM판단→규칙라우터→Agent',
   badges: ['Owner', 'Live'],
   actionLabel: 'CHANGELOG.md',
   href: '#',
@@ -46,13 +46,11 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(screen.getByText('Chat with us')).toBeInTheDocument()
     expect(screen.getByText('PDF')).toBeInTheDocument()
     expect(screen.getByText('① 상단 헤더에서 PDF 선택')).toBeInTheDocument()
-    expect(screen.getByText('② 질문→LLM판단→라우팅')).toBeInTheDocument()
-    expect(screen.getByText('· 이솝우화, ARKK 보고서')).toBeInTheDocument()
+    expect(screen.getByText('② 질문→LLM(어떤컬렉션)→규칙라우팅→Agent')).toBeInTheDocument()
+    expect(screen.getByText('· 이솝우화, ARKK 보고서 2개의 벡터DB')).toBeInTheDocument()
     expect(screen.getByText(/늑대와 어린양 한마디 결론은/)).toBeInTheDocument()
     expect(screen.getByText(/전체 목록/)).toBeInTheDocument()
-    expect(
-      screen.getByText('로드 청킹 벡터화 << 질문→LLM판단→규칙라우터→Agent'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('질문→LLM판단→규칙라우터→Agent')).toBeInTheDocument()
 
     button.click()
     expect(onHubNavigate).toHaveBeenCalledWith({

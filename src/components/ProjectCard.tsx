@@ -111,8 +111,8 @@ function AgenticRagThumbnail() {
       </div>
       <div className="agentic-thumbnail__body">
         <p className="agentic-thumbnail__line">① 상단 헤더에서 PDF 선택</p>
-        <p className="agentic-thumbnail__line">② 질문→LLM판단→라우팅</p>
-        <p className="agentic-thumbnail__sources">· 이솝우화, ARKK 보고서</p>
+        <p className="agentic-thumbnail__line">② 질문→LLM(어떤컬렉션)→규칙라우팅→Agent</p>
+        <p className="agentic-thumbnail__sources">· 이솝우화, ARKK 보고서 2개의 벡터DB</p>
         <p className="agentic-thumbnail__example">예) &quot;늑대와 어린양 한마디 결론은&quot;</p>
         <p className="agentic-thumbnail__example">예) &quot;전체 목록&quot; 검색</p>
       </div>
