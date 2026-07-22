@@ -206,6 +206,35 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* Projects: 제목 왼쪽 · 방문 통계 오른쪽 상단 */
+.shell__main-head--projects {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.shell__main-head-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.visit-stats {
+  margin: 0.2rem 0 0;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.visit-stats__sep {
+  margin: 0 0.35rem;
+  opacity: 0.55;
+}
+
 .shell__main-title {
   margin: 0;
   font-size: 1.65rem;

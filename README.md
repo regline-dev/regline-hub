@@ -109,8 +109,23 @@ npm run build      # dist/ → Vercel Output
 |------|-----|
 | Framework | Vite + React + TypeScript |
 | 배포 | GitHub `main` push → Vercel 자동 |
-| 방문자 | Vercel Web Analytics (`@vercel/analytics`) — 프로젝트 대시보드 **Analytics** 탭 |
+| 방문자(대시보드) | Vercel Web Analytics — 프로젝트 **Analytics** 탭 |
+| 방문자(사이트 표시) | Projects 우측 상단 Visitors/Views — `/api/visit` + `visits-data` 브랜치 JSON |
 | ~~Hetzner `:3003` Docker~~ | 이전 호스팅 — 현재 주 경로 아님 |
+
+### 사이트 방문 배지 (환경변수)
+
+Vercel 프로젝트 → Settings → Environment Variables:
+
+| 이름 | 필수 | 설명 |
+|------|------|------|
+| `VISIT_GITHUB_TOKEN` | ✅ | GitHub PAT (`contents: write` 또는 classic `repo`) |
+| `VISIT_GITHUB_OWNER` | | 기본 `regline-dev` |
+| `VISIT_GITHUB_REPO` | | 기본 `regline-hub` |
+| `VISIT_GITHUB_BRANCH` | | 기본 `visits-data` (main과 분리 → 재배포 안 탐) |
+| `VISIT_GITHUB_PATH` | | 기본 `visits.json` |
+
+토큰 저장 후 **Redeploy** 한 번. 첫 방문 시 `visits-data` 브랜치·파일이 자동 생성됩니다.
 
 ---
 

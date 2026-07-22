@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactElement } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { LinksPanel } from './components/LinksPanel'
 import { ProjectCard } from './components/ProjectCard'
+import { VisitStatsBadge } from './components/VisitStatsBadge'
 import { WorksCard } from './components/WorksCard'
 import { WorksPanel } from './components/WorksPanel'
 import { LINK_ITEMS } from './data/links'
@@ -205,11 +206,14 @@ function ProjectsView({
 }) {
   return (
     <>
-      <div className="shell__main-head">
-        <h1 className="shell__main-title">Projects</h1>
-        <p className="shell__main-desc">
-          작업물을 카드로 모아 둔 허브입니다. 카드의 링크로 각 앱을 엽니다.
-        </p>
+      <div className="shell__main-head shell__main-head--projects">
+        <div className="shell__main-head-text">
+          <h1 className="shell__main-title">Projects</h1>
+          <p className="shell__main-desc">
+            작업물을 카드로 모아 둔 허브입니다. 카드의 링크로 각 앱을 엽니다.
+          </p>
+        </div>
+        <VisitStatsBadge />
       </div>
 
       <section className="shell__grid" aria-label="프로젝트 목록">

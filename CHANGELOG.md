@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-07-22 (v2)
+
+**변경 파일**: Docs/20260722_regline-hub_방문카운터JSON_계획.md, api/visit.js, src/components/VisitStatsBadge.tsx, src/data/visitCounter.ts, src/App.tsx, src/styles.css, README.md
+
+**변경 내용**: Phase 2 — Projects 첫 화면 우측 상단에 Visitors/Views 대략 합계 표시
+
+- 외부 DB 없이 `visits-data` 브랜치 `visits.json` + `/api/visit`로 누적 (main 재배포와 분리)
+- 세션당 visitors 1회·접속마다 views — 숫자는 대략, “누군가 왔는지”용
+- Vercel에 `VISIT_GITHUB_TOKEN` 설정 필요 (미설정 시 배지 숨김)
+
+---
+
 ## 2026-07-22 (v1)
 
 **변경 파일**: Docs/20260722_regline-hub_VercelAnalytics_계획.md, src/App.tsx, src/App.test.tsx, package.json, README.md
