@@ -103,15 +103,10 @@ describe('사이드 네비 · Works · Links', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Links' })).toBeInTheDocument()
   })
 
-  it('Projects Agentic 카드 클릭 시 Works → LangGraph CHANGELOG.md로 이동한다', async () => {
-    const user = userEvent.setup()
+  it('Projects Agentic 카드는 어드민 PDF 생성 URL로 연결된다', () => {
     renderHub()
 
-    await user.click(screen.getByRole('button', { name: /CHANGELOG\.md/i }))
-
-    expect(screen.getByRole('heading', { level: 1, name: 'Works' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'LangGraph-Agentic CHANGELOG.md' }),
-    ).toBeInTheDocument()
+    const link = screen.getByRole('link', { name: /LangGraph-Agentic RAG/i })
+    expect(link).toHaveAttribute('href', 'http://167.233.211.67:3002/pdf/generate')
   })
 })

@@ -42,10 +42,9 @@ export const WORK_CARDS: WorkCard[] = [
     title: 'LangGraph-Agentic RAG',
     summary: 'Agent가 질문을 판단해 이솝·ARKK 벡터DB중 컬렉션으로 연결',
     badges: ['Owner', 'Live'],
-    actionLabel: 'CHANGELOG.md',
-    href: '#',
-    // Projects → Works → LangGraph-Agentic → CHANGELOG.md
-    hubTarget: { projectId: 'langgraph-agentic-backend', tab: 'ops' },
+    actionLabel: 'OPEN APP',
+    // 어드민 PDF 생성 화면 (PDF 모드 딥링크)
+    href: 'http://167.233.211.67:3002/pdf/generate',
   },
   {
     id: 'lotto-insight',

@@ -5,6 +5,16 @@
 
 ---
 
+## 2026-07-23 (v5)
+
+**변경 파일**: src/data/works.ts, src/components/ProjectCard.test.tsx, src/App.test.tsx
+
+**변경 내용**: Projects → LangGraph-Agentic RAG 카드를 어드민 PDF 생성 화면으로 연결
+
+- href: `http://167.233.211.67:3002/pdf/generate` · CTA `OPEN APP` (기존 Works CHANGELOG 내부 이동 해제)
+
+---
+
 ## 2026-07-22 (v4)
 
 **변경 파일**: src/components/ProjectCard.tsx, src/styles.css, src/data/works.ts, src/components/ProjectCard.test.tsx

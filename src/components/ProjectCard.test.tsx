@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { ProjectCard } from '../components/ProjectCard'
 import type { WorkCard } from '../data/works'
 
@@ -17,9 +17,8 @@ const agenticCard: WorkCard = {
   title: 'LangGraph-Agentic RAG',
   summary: 'Agent가 질문을 판단해 이솝·ARKK 벡터DB중 컬렉션으로 연결',
   badges: ['Owner', 'Live'],
-  actionLabel: 'CHANGELOG.md',
-  href: '#',
-  hubTarget: { projectId: 'langgraph-agentic-backend', tab: 'ops' },
+  actionLabel: 'OPEN APP',
+  href: 'http://167.233.211.67:3002/pdf/generate',
 }
 
 describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
@@ -32,16 +31,16 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     const link = screen.getByRole('link', { name: /OPEN APP/i })
     expect(link).toHaveAttribute('href', 'http://example.com:3001')
     expect(link).toHaveAttribute('target', '_blank')
-    // 카드 전체가 링크이므로 제목도 그 안에 포함돼야 한다
     expect(link).toContainElement(screen.getByRole('heading', { name: 'faq-chatbot' }))
   })
 
-  it('Agentic 카드는 PDF 안내·검색 예시와 Works CHANGELOG로 이동한다', () => {
-    const onHubNavigate = vi.fn()
-    render(<ProjectCard card={agenticCard} onHubNavigate={onHubNavigate} />)
+  it('Agentic 카드는 PDF 안내와 어드민 /pdf/generate 링크를 연다', () => {
+    render(<ProjectCard card={agenticCard} />)
 
-    const button = screen.getByRole('button', { name: /CHANGELOG\.md/i })
-    expect(button).not.toHaveClass('project-card--disabled')
+    const link = screen.getByRole('link', { name: /OPEN APP/i })
+    expect(link).toHaveAttribute('href', 'http://167.233.211.67:3002/pdf/generate')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).not.toHaveClass('project-card--disabled')
     expect(screen.getByText('Live')).toBeInTheDocument()
     expect(screen.getByText('Chat with us')).toBeInTheDocument()
     expect(screen.getByText('PDF')).toBeInTheDocument()
@@ -53,11 +52,5 @@ describe('ProjectCard (Hetzner 프로젝트 카드 레이아웃)', () => {
     expect(
       screen.getByText('Agent가 질문을 판단해 이솝·ARKK 벡터DB중 컬렉션으로 연결'),
     ).toBeInTheDocument()
-
-    button.click()
-    expect(onHubNavigate).toHaveBeenCalledWith({
-      projectId: 'langgraph-agentic-backend',
-      tab: 'ops',
-    })
   })
 })
