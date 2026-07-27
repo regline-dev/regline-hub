@@ -5,6 +5,14 @@
 
 ---
 
+## 2026-07-27 (v5) — 완료
+
+**변경 파일**: tsconfig.json
+
+**변경 내용**: Vercel `npm run build`의 `tsc`가 테스트 파일(`*.test.ts`)을 검사하지 않도록 제외 — `seoMeta.test.ts`의 Node 모듈 import로 배포가 깨지던 문제 해소
+
+---
+
 ## 2026-07-27 (v4) — 완료
 
 **변경 파일**: index.html, src/data/seoMeta.test.ts
