@@ -2,6 +2,7 @@
 
 > 포트폴리오 포털 — 카드로 작업물을 둘러보는 입구  
 > 호스팅: **Vercel** (정적 Vite SPA) · Production: https://regline-hub-three.vercel.app  
+> SEO(description·og): 루트 [`index.html`](./index.html) head에 고정 · 파비콘은 챗봇과 동일 `public/favicon.ico`  
 > 이 문서는 **현재 상태 스냅샷(README)** 입니다. 날짜별 변경 이력은 같은 레포의 [`CHANGELOG.md`](./CHANGELOG.md)에 둡니다.
 
 **README 작성 요령** (CHANGELOG와 다름)

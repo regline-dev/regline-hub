@@ -5,6 +5,41 @@
 
 ---
 
+## 2026-07-27 (v4) — 완료
+
+**변경 파일**: index.html, src/data/seoMeta.test.ts
+
+**변경 내용**: Google Search Console 소유권 확인용 **`google-site-verification`** 메타를 `index.html`에 추가
+
+---
+
+## 2026-07-27 (v3) — 완료
+
+**변경 파일**: index.html, src/data/seoMeta.test.ts, Docs/20260727_프로젝트별_SEO_메타태그_계획.md, README.md
+
+**변경 내용**: 포트폴리오 포털 `index.html`에 **description·keywords·Open Graph** 최소 SEO 세트를 넣고, 문구·og:url을 계획서 Phase 1 기준으로 고정
+
+- og:image는 당분간 `/favicon.ico` Absolute URL (전용 og.png는 보류)
+- `seoMeta.test.ts`로 index.html 메타 존재 검증
+
+---
+
+## 2026-07-27 (v2) — 완료
+
+**변경 파일**: public/favicon.ico, index.html
+
+**변경 내용**: 탭 아이콘을 챗봇(`frontend_react/public/favicon.ico`)과 **동일한 파비콘**으로 맞춤 — `favicon.svg` 대신 `/favicon.ico` 사용
+
+---
+
+## 2026-07-27 (v1) — 착수
+
+**변경 파일**: Docs/20260727_프로젝트별_SEO_메타태그_계획.md
+
+**변경 내용**: 공개 프론트(regline-hub · frontend_react · admin)별 **메타태그·검색어(SEO)** 설정 계획 착수 — hub는 description/og 부재, 챗봇·어드민은 description만 있는 상태를 Phase로 나눠 보완
+
+---
+
 ## 2026-07-23 (v5)
 
 **변경 파일**: src/data/works.ts, src/components/ProjectCard.test.tsx, src/App.test.tsx
