@@ -29,10 +29,18 @@ export function ProjectCard({ card, onHubNavigate }: ProjectCardProps) {
   }
 
   const hasLink = card.href !== '#'
+  const isZipDownload = hasLink && card.href.toLowerCase().endsWith('.zip')
   return (
     <a
       className={className}
-      {...(hasLink ? { href: card.href, target: '_blank', rel: 'noopener noreferrer' } : {})}
+      {...(hasLink
+        ? {
+            href: card.href,
+            ...(isZipDownload
+              ? { download: true }
+              : { target: '_blank', rel: 'noopener noreferrer' }),
+          }
+        : {})}
     >
       {body}
     </a>
@@ -297,6 +305,8 @@ function CardIcon({ id }: { id: string }) {
       return <BookIcon />
     case 'self-introduction':
       return <UserIcon />
+    case 'pdf-test-pack':
+      return <DownloadIcon />
     case 'resume':
       return <UserIcon />
     case 'agentic-rag':
@@ -321,6 +331,8 @@ function iconTone(id: string): 'teal' | 'violet' | 'amber' | 'slate' | 'blue' | 
       return 'amber'
     case 'self-introduction':
       return 'rose'
+    case 'pdf-test-pack':
+      return 'blue'
     case 'resume':
       return 'slate'
     case 'agentic-rag':
@@ -388,6 +400,16 @@ function UserIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <circle cx="12" cy="8" r="3.5" />
       <path d="M4.5 20c0-3.87 3.36-7 7.5-7s7.5 3.13 7.5 7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 4v10" strokeLinecap="round" />
+      <path d="M8 10.5 12 14.5 16 10.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 18.5h14" strokeLinecap="round" />
     </svg>
   )
 }

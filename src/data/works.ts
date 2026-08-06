@@ -82,6 +82,15 @@ export const WORK_CARDS: WorkCard[] = [
     section: 'profile',
   },
   {
+    id: 'pdf-test-pack',
+    title: '테스트 자료',
+    summary: 'PDF 테스트용 샘플 ZIP',
+    badges: ['ZIP'],
+    actionLabel: 'DOWNLOAD ZIP',
+    href: '/docs/pdf_down.zip',
+    section: 'profile',
+  },
+  {
     id: 'resume',
     title: '이력서',
     summary: '이력서 (PDF)',
