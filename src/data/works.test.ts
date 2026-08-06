@@ -18,7 +18,6 @@ describe('WORK_CARDS 스키마', () => {
       'chatbot-manual',
       'budget-guide',
       'self-introduction',
-      'pdf-test-pack',
       'resume',
     ])
   })
