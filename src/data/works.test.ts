@@ -25,13 +25,14 @@ describe('WORK_CARDS 스키마', () => {
 })
 
 describe('LINK_ITEMS 스키마', () => {
-  it('바로가기 4개와 필수 href를 가진다', () => {
+  it('바로가기 목록과 필수 href를 가진다', () => {
     expect(() => assertLinkItemsReady(LINK_ITEMS)).not.toThrow()
     expect(LINK_ITEMS.map((item) => item.id)).toEqual([
       'tistory',
       'github',
       'mail',
       'resume-pdf',
+      'pdf-test-pack',
     ])
   })
 })

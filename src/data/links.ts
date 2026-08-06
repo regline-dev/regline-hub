@@ -4,7 +4,7 @@ export type LinkItem = {
   label: string
   href: string
   /** 아이콘 구분용 */
-  icon: 'tistory' | 'github' | 'mail' | 'pdf'
+  icon: 'tistory' | 'github' | 'mail' | 'pdf' | 'zip'
 }
 
 /** GitHub: org 프로필 (pinned는 GitHub 설정으로 관리) */
@@ -32,6 +32,12 @@ export const LINK_ITEMS: LinkItem[] = [
     label: '자기소개서 PDF',
     href: '/docs/self-introduction.pdf',
     icon: 'pdf',
+  },
+  {
+    id: 'pdf-test-pack',
+    label: '테스트 자료 ZIP',
+    href: '/docs/pdf_down.zip',
+    icon: 'zip',
   },
 ]
 

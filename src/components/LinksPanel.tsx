@@ -8,24 +8,30 @@ type LinksPanelProps = {
 export function LinksPanel({ items }: LinksPanelProps) {
   return (
     <ul className="links-list" aria-label="바로가기 목록">
-      {items.map((item) => (
-        <li key={item.id}>
-          <a
-            className="links-list__row"
-            href={item.href}
-            target={item.href.startsWith('mailto:') ? undefined : '_blank'}
-            rel={item.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-          >
-            <span className="links-list__icon" aria-hidden="true">
-              <LinkRowIcon icon={item.icon} />
-            </span>
-            <span className="links-list__label">{item.label}</span>
-            <span className="links-list__arrow" aria-hidden="true">
-              ↗
-            </span>
-          </a>
-        </li>
-      ))}
+      {items.map((item) => {
+        const isZip = item.href.toLowerCase().endsWith('.zip')
+        return (
+          <li key={item.id}>
+            <a
+              className="links-list__row"
+              href={item.href}
+              {...(item.href.startsWith('mailto:')
+                ? {}
+                : isZip
+                  ? { download: true }
+                  : { target: '_blank', rel: 'noopener noreferrer' })}
+            >
+              <span className="links-list__icon" aria-hidden="true">
+                <LinkRowIcon icon={item.icon} />
+              </span>
+              <span className="links-list__label">{item.label}</span>
+              <span className="links-list__arrow" aria-hidden="true">
+                {isZip ? '↓' : '↗'}
+              </span>
+            </a>
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -57,6 +63,14 @@ function LinkRowIcon({ icon }: { icon: LinkItem['icon'] }) {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M7 3h7l4 4v14H7z" strokeLinejoin="round" />
           <path d="M14 3v4h4M9 13h6M9 17h4" strokeLinecap="round" />
+        </svg>
+      )
+    case 'zip':
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M12 4v10" strokeLinecap="round" />
+          <path d="M8 10.5 12 14.5 16 10.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5 18.5h14" strokeLinecap="round" />
         </svg>
       )
     default:
