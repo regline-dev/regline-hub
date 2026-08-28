@@ -48,18 +48,22 @@ export function ProjectCard({ card, onHubNavigate }: ProjectCardProps) {
 }
 
 function ProjectCardBody({ card }: { card: WorkCard }): ReactNode {
+  const hasThumbnail =
+    card.id === 'faq-chatbot' ||
+    card.id === 'chatbot-admin' ||
+    card.id === 'lotto-insight' ||
+    card.id === 'agentic-rag' ||
+    card.id === 'ocr-tab'
+  const headerClass = [
+    'project-card__header',
+    hasThumbnail ? 'project-card__header--thumbnail' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
     <>
-      <div
-        className={
-          card.id === 'faq-chatbot' ||
-          card.id === 'chatbot-admin' ||
-          card.id === 'lotto-insight' ||
-          card.id === 'agentic-rag'
-            ? 'project-card__header project-card__header--thumbnail'
-            : 'project-card__header'
-        }
-      >
+      <div className={headerClass}>
         <div className="project-card__top">
           <div className="project-card__title-row">
             <span
@@ -96,6 +100,7 @@ function ProjectCardBody({ card }: { card: WorkCard }): ReactNode {
         {card.id === 'chatbot-admin' && <ChatbotAdminThumbnail />}
         {card.id === 'lotto-insight' && <LottoInsightThumbnail />}
         {card.id === 'agentic-rag' && <AgenticRagThumbnail />}
+        {card.id === 'ocr-tab' && <OcrTabThumbnail />}
         {card.section === 'docs' && <DocThumbnail />}
         {card.section === 'profile' && <ProfileThumbnail />}
 
@@ -123,6 +128,25 @@ function AgenticRagThumbnail() {
         <p className="agentic-thumbnail__sources">· 이솝우화, ARKK 보고서 2개의 벡터DB</p>
         <p className="agentic-thumbnail__example">예) &quot;늑대와 어린양 한마디 결론은&quot;</p>
         <p className="agentic-thumbnail__example">예) &quot;전체 목록&quot; 검색</p>
+      </div>
+    </div>
+  )
+}
+
+/** ocr-tab 카드 전용 — 같은 채팅창 목업, 배지·본문만 OCR */
+function OcrTabThumbnail() {
+  return (
+    <div className="agentic-thumbnail agentic-thumbnail--ocr" aria-hidden="true">
+      <div className="agentic-thumbnail__header">
+        <span className="agentic-thumbnail__title">Chat with us</span>
+        <span className="agentic-thumbnail__mode">OCR</span>
+      </div>
+      <div className="agentic-thumbnail__body">
+        <p className="agentic-thumbnail__line">① 상단 헤더에서 OCR 선택</p>
+        <p className="agentic-thumbnail__line">② 사진이나 채팅으로 품목→ 수량·단가 → 영수증</p>
+        <p className="agentic-thumbnail__sources">· 미리보기 · 저장하기 · 다운로드</p>
+        <p className="agentic-thumbnail__example">예) &quot;품목 2개 2000원&quot;</p>
+        <p className="agentic-thumbnail__example">예) 사진 업로드 후 품목 확인</p>
       </div>
     </div>
   )
@@ -309,6 +333,8 @@ function CardIcon({ id }: { id: string }) {
       return <UserIcon />
     case 'agentic-rag':
       return <ChatIcon />
+    case 'ocr-tab':
+      return <ChatIcon />
     default:
       return <FolderIcon />
   }
@@ -333,6 +359,8 @@ function iconTone(id: string): 'teal' | 'violet' | 'amber' | 'slate' | 'blue' | 
       return 'slate'
     case 'agentic-rag':
       return 'violet'
+    case 'ocr-tab':
+      return 'teal'
     default:
       return 'slate'
   }

@@ -13,10 +13,12 @@ describe('WORK_CARDS 스키마', () => {
     expect(WORK_CARDS.map((card) => card.id)).toEqual([
       'faq-chatbot',
       'chatbot-admin',
+      'ocr-tab',
       'agentic-rag',
       'lotto-insight',
       'chatbot-manual',
       'budget-guide',
+      'ocr-dev-guide',
       'self-introduction',
       'resume',
     ])
@@ -77,5 +79,14 @@ describe('resolveHubUrls', () => {
   it('__HOST__ 템플릿을 접속 hostname 포트로 바꾼다', () => {
     const resolved = resolveHubUrls(WORK_CARDS, '167.233.211.67')
     expect(resolved[0].href).toBe('http://167.233.211.67:3001')
+  })
+})
+
+describe('OCR 허브 딥링크', () => {
+  it('OCR 카드만 위젯+OCR 채널이고 chatbot-ui는 루트다', () => {
+    const ocr = WORK_CARDS.find((card) => card.id === 'ocr-tab')
+    const faq = WORK_CARDS.find((card) => card.id === 'faq-chatbot')
+    expect(ocr?.href).toBe('http://167.233.211.67:3001/?widget=true&channel=ocr')
+    expect(faq?.href).toBe('http://167.233.211.67:3001')
   })
 })

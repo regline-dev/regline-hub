@@ -38,6 +38,14 @@ export const WORK_CARDS: WorkCard[] = [
     href: 'http://167.233.211.67:3002',
   },
   {
+    id: 'ocr-tab',
+    title: 'OCR - Agent',
+    summary: '영수증·견적서 등 문서 OCR 인식 → 자동 작성',
+    badges: ['Owner', 'Live'],
+    actionLabel: 'OPEN APP',
+    href: 'http://167.233.211.67:3001/?widget=true&channel=ocr',
+  },
+  {
     id: 'agentic-rag',
     title: 'LangGraph-Agentic RAG',
     summary: 'Agent가 질문을 판단해 이솝·ARKK 벡터DB중 컬렉션으로 연결',
@@ -70,6 +78,15 @@ export const WORK_CARDS: WorkCard[] = [
     badges: ['Guide'],
     actionLabel: 'VIEW MANUAL',
     href: '/budget_guide.html',
+    section: 'docs',
+  },
+  {
+    id: 'ocr-dev-guide',
+    title: 'OCR 개발가이드',
+    summary: 'OCR 그래프 마이그레이션 · 구현 현황',
+    badges: ['Guide'],
+    actionLabel: 'VIEW MANUAL',
+    href: '/ocr_dev_guide.html',
     section: 'docs',
   },
   {

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCR 개발 가이드 — LLM→Tool 흐름 + 구현 현황</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+      background: #f4f6f9;
+      color: #242a35;
+      padding: 2rem 1.5rem 3rem;
+    }
+    .frame { max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 1.25rem; margin-bottom: 0.35rem; }
+    h2 { font-size: 1.05rem; margin: 2rem 0 0.6rem; }
+    h3 { font-size: 0.92rem; margin: 1.4rem 0 0.5rem; }
+    p.lede { font-size: 0.85rem; color: #5c6472; margin-bottom: 1.5rem; line-height: 1.5; }
+    p.note { font-size: 0.82rem; color: #5c6472; margin-top: 0.75rem; line-height: 1.55; }
+    svg { width: 100%; display: block; background: #fff; border: 1px solid #e2e6ee; border-radius: 8px; }
+    .ex-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      background: #fff;
+      border: 1px solid #e2e6ee;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .ex-table th, .ex-table td {
+      border: 1px solid #e2e6ee;
+      padding: 0.55rem 0.7rem;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.45;
+    }
+    .ex-table th { background: #fff3e0; color: #5c6472; font-weight: 700; }
+    .ex-table tr:nth-child(even) td { background: #fafafa; }
+    .status-banner {
+      background: #fff8e1; border: 1px solid #f9a825; border-radius: 8px;
+      padding: 0.9rem 1.1rem; font-size: 0.82rem; line-height: 1.6; margin-bottom: 1.5rem;
+    }
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0.12rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+    .badge-done { background: #c8e6c9; color: #1b5e20; }
+    .badge-progress { background: #fff9c4; color: #7a5c00; }
+    .badge-draft { background: #e3f2fd; color: #0d47a1; }
+    .badge-hold { background: #eceff1; color: #455a64; }
+    .badge-check { background: #ffccbc; color: #9c2b00; }
+    code.inline { background: #eef1f5; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.85em; }
+    .toc { background: #fff; border: 1px solid #e2e6ee; border-radius: 8px; padding: 0.9rem 1.2rem; font-size: 0.82rem; margin-bottom: 1.5rem; }
+    .toc ol { margin-left: 1.1rem; line-height: 1.9; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <h1>OCR 개발 가이드 — LLM→Tool 흐름 + 구현 현황</h1>
+    <p class="lede"><strong>LangGraph-Agentic-backend</strong> · OCR 전용 StateGraph (PDF <code class="inline">workflow.py</code> 와 <strong>별도</strong>). LLM → Tool #1/#2/#3.</p>
+    <p class="lede">이미지 · 미리보기 이후 추가 품목 · 텍스트 첫 입력</p>
+
+    <div class="status-banner">
+      <strong>이 문서는 두 파트로 구성됩니다.</strong><br>
+      <strong>1부(설계)</strong> — 2026-08-27 확정된 원본 흐름도. 그래프 마이그레이션의 기준 설계로, 구현 이후에도 원문 그대로 유지합니다.<br>
+      <strong>2부(구현 현황)</strong> — 마이그레이션·실사용 테스트 과정에서 나온 버그 수정, 신규 결정 사항, DB 설계 초안을 시간순으로 정리했습니다. 각 항목에 <span class="badge badge-done">완료</span> <span class="badge badge-progress">진행중</span> <span class="badge badge-draft">설계만</span> <span class="badge badge-hold">보류</span> <span class="badge badge-check">확인필요</span> 상태를 표기합니다 — Cursor 보고 기반이며, 별도 표기 없는 한 코드님의 실사용(프론트) 재검증 전입니다.<br>
+      최종 갱신: 2026-08-28
+    </div>
+
+    <div class="toc">
+      <strong>2부 목차</strong>
+      <ol>
+        <li><a href="#impl-summary">구현 요약 — 그래프 마이그레이션</a></li>
+        <li><a href="#impl-routing">라우팅·되물음 버그 수정 3건</a></li>
+        <li><a href="#impl-qty">수량 파싱 · 결측 대칭 처리</a></li>
+        <li><a href="#impl-pdf">PDF 다운로드 = 미리보기 일치</a></li>
+        <li><a href="#impl-autokind">문서종류 자동선택</a></li>
+        <li><a href="#impl-db">DB 설계 — 공급자정보 · 발급이력 ERD</a></li>
+        <li><a href="#impl-open">보류 · 확인 필요 항목</a></li>
+      </ol>
+    </div>
+
+    <h2 style="margin-top:0.5rem">1부 — 설계 (2026-08-27 확정 원본)</h2>
+    <!--
+      레이아웃 열:
+        오류 | 메인 성공 | Tool #2·확정 | 미확정 루프
+    -->
+    <h3>Tool Node 구조</h3>
+    <svg viewBox="0 0 960 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OCR Tool Node 구조">
+      <defs>
+        <marker id="arr-t" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5c6472"/>
+        </marker>
+        <marker id="arr-t-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#c62828"/>
+        </marker>
+      </defs>
+      <g font-family="Noto Sans KR, sans-serif" font-size="11" text-anchor="middle">
+        <!-- LLM (가운데) -->
+        <rect x="380" y="6" width="200" height="28" rx="4" fill="#e1bee7" stroke="#5c6472"/>
+        <text x="480" y="24" font-size="11">LLM (라우터)</text>
+        <!-- LLM → 각 Node -->
+        <path d="M 480 34 L 480 58" fill="none" stroke="#5c6472" stroke-width="1.5"/>
+        <path d="M 160 58 L 800 58" fill="none" stroke="#5c6472" stroke-width="1.5"/>
+        <path d="M 160 58 L 160 76" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#arr-t)"/>
+        <path d="M 480 58 L 480 76" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#arr-t)"/>
+        <path d="M 800 58 L 800 76" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#arr-t)"/>
+
+        <!-- #1 x=30 w=260 | gap 60 | #2 x=350 | gap 60 | #3 x=670 -->
+        <rect x="30" y="76" width="260" height="150" rx="5" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="160" y="92" font-size="11" font-weight="700" fill="#7b1fa2">Tool Node #1</text>
+        <text x="160" y="104" font-size="8" fill="#5c6472">구조화·파싱</text>
+        <rect x="42" y="110" width="236" height="20" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="160" y="124" font-size="9">원문→품목·수량·단가</text>
+        <rect x="42" y="134" width="236" height="20" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="160" y="148" font-size="9">확정/미확정 분리</text>
+        <rect x="42" y="158" width="236" height="20" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="160" y="172" font-size="9">여러 입력 품목 합침</text>
+        <rect x="42" y="182" width="236" height="20" rx="3" fill="#eceff1" stroke="#5c6472"/>
+        <text x="160" y="196" font-size="9" fill="#8b91a0">(보류) 못 읽음+이유(이미지)</text>
+
+        <path d="M 290 151 L 350 151" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#arr-t)"/>
+
+        <rect x="350" y="76" width="260" height="150" rx="5" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="480" y="92" font-size="11" font-weight="700" fill="#7b1fa2">Tool Node #2</text>
+        <text x="480" y="104" font-size="8" fill="#5c6472">완결·검산·되물음</text>
+        <rect x="362" y="110" width="236" height="20" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="480" y="124" font-size="9">필수값 완결 검사</text>
+        <rect x="362" y="134" width="236" height="20" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="480" y="148" font-size="9">수량×단가 검산</text>
+        <rect x="362" y="158" width="236" height="20" rx="3" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="480" y="172" font-size="9">되물음 생성</text>
+        <rect x="362" y="182" width="236" height="20" rx="3" fill="#c8e6c9" stroke="#5c6472"/>
+        <text x="480" y="196" font-size="9">전체 확정 판정</text>
+
+        <rect x="670" y="76" width="260" height="150" rx="5" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="800" y="92" font-size="11" font-weight="700" fill="#7b1fa2">Tool Node #3</text>
+        <text x="800" y="104" font-size="8" fill="#5c6472">수정·맥락</text>
+        <rect x="682" y="110" width="236" height="20" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="800" y="124" font-size="9">수정 의도 해석</text>
+        <rect x="682" y="134" width="236" height="20" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="800" y="148" font-size="9">품목 불명→되물음</text>
+        <rect x="682" y="158" width="236" height="20" rx="3" fill="#fff9c4" stroke="#5c6472"/>
+        <text x="800" y="172" font-size="9">답변·수정 반영</text>
+        <rect x="682" y="182" width="236" height="20" rx="3" fill="#e3f2fd" stroke="#5c6472"/>
+        <text x="800" y="196" font-size="9">반영→#2 재검사</text>
+
+        <path d="M 670 151 L 610 151" fill="none" stroke="#5c6472" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-t)"/>
+
+        <!-- 미완 루프: #2 바로 왼쪽 짧게 → 위로 재진입 -->
+        <path d="M 480 226 L 480 248 L 318 248 L 318 120 L 350 120" fill="none" stroke="#c62828" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arr-t-r)"/>
+        <text x="395" y="244" font-size="9" fill="#c62828">미확정 남으면 반복</text>
+      </g>
+    </svg>
+
+    <h2>이미지 업로드 흐름</h2>
+    <svg viewBox="0 0 960 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OCR 이미지 흐름 LLM Tool">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5c6472"/>
+        </marker>
+        <marker id="arr-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#2f6fed"/>
+        </marker>
+        <marker id="arr-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#c62828"/>
+        </marker>
+        <marker id="arr-p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#7b1fa2"/>
+        </marker>
+      </defs>
+
+      <g font-family="Noto Sans KR, sans-serif" font-size="13" text-anchor="middle" transform="translate(-15, 12)">
+
+        <!-- ===== 메인 열 (성공) center=240 ===== -->
+        <ellipse cx="240" cy="32" rx="70" ry="20" fill="#e1f5ff" stroke="#5c6472"/>
+        <text x="240" y="37">채팅창 열림</text>
+
+        <line x1="240" y1="52" x2="240" y2="66" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="160" y="66" width="160" height="34" rx="4" fill="#fff9c4" stroke="#5c6472"/>
+        <text x="240" y="88">OCR 탭</text>
+
+        <line x1="240" y1="100" x2="240" y2="114" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="160" y="114" width="160" height="34" rx="4" fill="#fff9c4" stroke="#5c6472" stroke-dasharray="6 4"/>
+        <text x="240" y="136" font-size="12">OCR 세션 생성</text>
+
+        <!-- 저장본 불러오기 (왼쪽 · OCR 탭 높이) -->
+        <rect x="40" y="66" width="90" height="46" rx="4" fill="#f3e5f5" stroke="#5c6472" stroke-dasharray="4 3"/>
+        <text x="85" y="84" font-size="11">저장본</text>
+        <text x="85" y="100" font-size="11">불러오기</text>
+        <path d="M 77 112 L 77 131" fill="none" stroke="#5c6472" stroke-width="1.5"/>
+
+        <line x1="240" y1="148" x2="240" y2="162" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="160" y="162" width="160" height="40" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="178">이미지 업로드</text>
+        <text x="240" y="194" font-size="10" fill="#5c6472">여러 장→품목 합침</text>
+
+        <line x1="240" y1="202" x2="240" y2="216" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="160" y="216" width="160" height="34" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="238">Vision</text>
+
+        <line x1="240" y1="250" x2="240" y2="264" stroke="#5c6472" marker-end="url(#arr)"/>
+        <polygon points="240,264 278,288 240,312 202,288" fill="#fff" stroke="#5c6472" stroke-width="1.5"/>
+        <text x="240" y="284" font-size="11">이미지</text>
+        <text x="240" y="298" font-size="11">결과</text>
+
+        <!-- 오류: 같은 높이 왼쪽 — 안내 모달 <—— 이미지결과 -->
+        <text x="155" y="278" font-size="11" fill="#c62828">오류</text>
+        <line x1="202" y1="288" x2="115" y2="288" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr-r)"/>
+        <rect x="40" y="274" width="75" height="28" rx="4" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="77" y="293" font-size="12">안내 모달</text>
+
+        <!-- 안내 모달·저장본 → 합류(x=77,y=131) → OCR 세션 생성 · 경로 라벨만 구분 -->
+        <path d="M 77 274 L 77 131 L 160 131" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+        <circle cx="77" cy="131" r="4" fill="#2f6fed"/>
+        <!-- 저장본 쪽(합류 직상) -->
+        <text x="42" y="126" font-size="10" fill="#2f6fed">데이터 복원</text>
+        <!-- 안내 모달 쪽(합류 직하 · 복원할 데이터 없음) -->
+        <text x="42" y="210" font-size="10" fill="#2f6fed">신규 초기화</text>
+
+        <!-- ===== 성공 분기: 메인 열 계속 ===== -->
+        <text x="305" y="280" font-size="11" fill="#2e7d32">성공</text>
+        <line x1="240" y1="312" x2="240" y2="330" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="160" y="330" width="160" height="40" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="346" font-size="12">원본 이미지 +</text>
+        <text x="240" y="362" font-size="12">원본 텍스트</text>
+
+        <line x1="240" y1="370" x2="240" y2="386" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="160" y="386" width="160" height="40" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="402" font-size="12">backend_python</text>
+        <text x="240" y="418" font-size="12">/ocr/turn 중계</text>
+
+        <line x1="240" y1="426" x2="240" y2="442" stroke="#5c6472" marker-end="url(#arr)"/>
+        <!-- OCR StateGraph (PDF workflow 별도) -->
+        <rect x="140" y="438" width="200" height="248" rx="6" fill="none" stroke="#9c27b0" stroke-dasharray="5 3"/>
+        <text x="240" y="452" font-size="10" fill="#9c27b0">OCR StateGraph</text>
+        <text x="240" y="464" font-size="9" fill="#8b91a0">PDF workflow 별도</text>
+
+        <rect x="160" y="472" width="160" height="32" rx="4" fill="#e1bee7" stroke="#5c6472"/>
+        <text x="240" y="492" font-size="11">/ocr/turn</text>
+
+        <line x1="240" y1="504" x2="240" y2="516" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="160" y="516" width="160" height="28" rx="4" fill="#e1bee7" stroke="#5c6472"/>
+        <text x="240" y="534" font-size="11">LLM (라우터)</text>
+
+        <line x1="240" y1="544" x2="240" y2="556" stroke="#5c6472" marker-end="url(#arr)"/>
+        <!-- Tool Node #1 큰 박스 -->
+        <rect x="152" y="556" width="176" height="118" rx="4" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="240" y="572" font-size="11" font-weight="700" fill="#7b1fa2">Tool Node #1</text>
+        <rect x="162" y="580" width="156" height="24" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="596" font-size="10">원문→품목 추출</text>
+        <rect x="162" y="608" width="156" height="24" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="624" font-size="10">확정/미확정 분리</text>
+        <rect x="162" y="636" width="156" height="24" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="652" font-size="10">품목 합침</text>
+
+        <!-- #1 → Tool Node #2 (3단) -->
+        <path d="M 328 610 L 368 610 L 368 130 L 407 130" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+        <!-- ===== Tool Node #2 (큰 박스) center=495 ===== -->
+        <rect x="407" y="14" width="176" height="168" rx="4" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="495" y="32" font-size="12" font-weight="700" fill="#7b1fa2">Tool Node #2</text>
+        <rect x="417" y="40" width="156" height="24" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="495" y="56" font-size="10">필수값 완결 검사</text>
+        <rect x="417" y="68" width="156" height="24" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="495" y="84" font-size="10">수량×단가 검산</text>
+        <rect x="417" y="96" width="156" height="24" rx="3" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="495" y="112" font-size="10">되물음 생성</text>
+        <rect x="417" y="124" width="156" height="24" rx="3" fill="#c8e6c9" stroke="#5c6472"/>
+        <text x="495" y="140" font-size="10">전체 확정 판정</text>
+        <text x="495" y="168" font-size="10" fill="#2e7d32">↓ 전체 확정</text>
+        <line x1="495" y1="182" x2="495" y2="198" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="415" y="198" width="160" height="34" rx="4" fill="#c8e6c9" stroke="#5c6472"/>
+        <text x="495" y="220">완료된 전체 내용</text>
+
+        <line x1="495" y1="232" x2="495" y2="248" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="415" y="248" width="160" height="40" rx="4" fill="#e8f5e9" stroke="#5c6472"/>
+        <text x="495" y="264" font-size="11">문서종류 선택</text>
+        <text x="495" y="280" font-size="10" fill="#5c6472">(버튼 클릭)</text>
+
+        <line x1="495" y1="288" x2="495" y2="304" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="415" y="304" width="160" height="34" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="495" y="326">미리보기</text>
+
+        <!-- 미리보기 → 채팅 텍스트 입력 (2·3단 사이 · 채팅만) -->
+        <line x1="575" y1="318" x2="655" y2="318" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+        <text x="615" y="308" font-size="10" fill="#2f6fed">채팅</text>
+
+        <rect x="655" y="298" width="150" height="34" rx="4" fill="#e3f2fd" stroke="#5c6472"/>
+        <text x="730" y="320" font-size="12">채팅 텍스트 입력</text>
+
+        <line x1="730" y1="332" x2="730" y2="348" stroke="#5c6472" marker-end="url(#arr)"/>
+        <polygon points="730,348 770,370 730,392 690,370" fill="#fff" stroke="#5c6472" stroke-width="1.5"/>
+        <text x="730" y="366" font-size="11">인사?</text>
+        <text x="730" y="380" font-size="10" fill="#5c6472">만인가</text>
+
+        <text x="815" y="366" font-size="10" fill="#5c6472">예</text>
+        <line x1="770" y1="370" x2="825" y2="370" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="825" y="344" width="130" height="56" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="890" y="362" font-size="11">안내만</text>
+        <text x="890" y="378" font-size="9" fill="#5c6472">품목명·수량·단가를</text>
+        <text x="890" y="390" font-size="9" fill="#5c6472">입력하세요</text>
+
+        <!-- 안내만 → 채팅 텍스트 입력으로 복귀 (막다른 골목 방지) -->
+        <path d="M 890 344 L 890 260 L 790 260 L 790 298" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+        <text x="845" y="254" font-size="10" fill="#2f6fed">복귀</text>
+
+        <text x="705" y="408" font-size="10" fill="#c62828">아니오</text>
+        <path d="M 730 392 L 730 420 L 835 420" fill="none" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+        <!-- 신규 추가 vs 기존 수정 판별 (LLM 라우터의 data/edit 분류, Tool 역할 0-1) -->
+        <polygon points="870,400 905,420 870,440 835,420" fill="#fff" stroke="#5c6472" stroke-width="1.5"/>
+        <text x="870" y="415" font-size="9">추가/수정</text>
+        <text x="870" y="427" font-size="9">판별</text>
+
+        <text x="845" y="452" font-size="10" fill="#2e7d32">신규</text>
+        <path d="M 870 440 L 870 448 L 805 448" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#arr)"/>
+        <rect x="655" y="412" width="150" height="40" rx="4" fill="#fff3e0" stroke="#5c6472"/>
+        <text x="730" y="428" font-size="11">품목 후보로 처리</text>
+        <text x="730" y="444" font-size="10" fill="#5c6472">LLM→Tool #1·#2</text>
+
+        <text x="912" y="412" font-size="10" fill="#7b1fa2">수정</text>
+        <path d="M 905 420 L 920 420 L 920 580" fill="none" stroke="#7b1fa2" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <line x1="730" y1="452" x2="730" y2="468" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="655" y="468" width="150" height="40" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="730" y="484" font-size="11">품목·수량·단가</text>
+        <text x="730" y="500" font-size="10" fill="#5c6472">확보될 때까지</text>
+
+        <line x1="730" y1="508" x2="730" y2="524" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="655" y="524" width="150" height="34" rx="4" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="730" y="546" font-size="12">추가할까요?</text>
+
+        <text x="712" y="518" font-size="10" fill="#2e7d32">예</text>
+        <line x1="730" y1="558" x2="730" y2="574" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="655" y="574" width="150" height="40" rx="4" fill="#c8e6c9" stroke="#5c6472"/>
+        <text x="730" y="590" font-size="11">예 → 품목 추가</text>
+        <text x="730" y="606" font-size="10" fill="#5c6472">Tool #1·#2 → 갱신</text>
+
+        <!-- 아니오 → 후보 폐기 → 채팅 텍스트 입력으로 복귀 (확정 목록·미리보기는 유지) -->
+        <text x="822" y="535" font-size="10" fill="#c62828">아니오</text>
+        <path d="M 805 541 L 965 541 L 965 240 L 700 240 L 700 298" fill="none" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr-r)"/>
+        <text x="885" y="234" font-size="10" fill="#c62828">후보 폐기 → 복귀</text>
+
+        <!-- 품목 추가 → 미리보기 (왼쪽 중간 → 2·3단 사이 꺾임) -->
+        <path d="M 655 594 L 620 594 L 620 328 L 575 328" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+        <text x="600" y="586" font-size="10" fill="#2f6fed">갱신</text>
+
+        <!-- 미리보기 ↓ 문서종류 재선택 (세로 간격 — 겹침 없음) -->
+        <line x1="495" y1="338" x2="495" y2="358" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="415" y="358" width="160" height="44" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="495" y="376" font-size="12">문서종류 재선택</text>
+        <text x="495" y="392" font-size="10" fill="#5c6472">견적·거래명세·영수증·청구</text>
+
+        <path d="M 415 380 L 390 380 L 390 268 L 415 268" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+        <text x="368" y="322" font-size="10" fill="#2f6fed">미리보기 갱신</text>
+
+        <line x1="495" y1="402" x2="495" y2="422" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="415" y="422" width="160" height="44" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="495" y="440">저장 / 다운로드</text>
+        <text x="495" y="456" font-size="10" fill="#5c6472">보내기=보류(비활성)</text>
+
+        <line x1="495" y1="466" x2="495" y2="486" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="415" y="486" width="160" height="34" rx="4" fill="#fff9c4" stroke="#5c6472"/>
+        <text x="495" y="508">+ 새 작업</text>
+
+        <line x1="495" y1="520" x2="495" y2="540" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="415" y="540" width="160" height="34" rx="4" fill="#fff9c4" stroke="#5c6472" stroke-dasharray="6 4"/>
+        <text x="495" y="562">OCR 세션 생성</text>
+
+        <!-- ===== 미확정 루프 (3단) ===== -->
+        <text x="620" y="92" font-size="12" fill="#c62828">미확정</text>
+        <line x1="583" y1="96" x2="655" y2="96" stroke="#c62828" marker-end="url(#arr-r)"/>
+
+        <rect x="655" y="14" width="250" height="48" rx="6" fill="#fff8e1" stroke="#f9a825" stroke-dasharray="6 4"/>
+        <text x="780" y="32" font-size="11" fill="#242a35">※ 미확정 품목이 남는 동안 반복</text>
+        <text x="780" y="50" font-size="10" fill="#242a35">되물음 → 답변 → 종류별 Tool 재진입</text>
+
+        <rect x="655" y="72" width="110" height="34" rx="4" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="710" y="94">채팅 되물음</text>
+
+        <line x1="765" y1="89" x2="795" y2="89" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="795" y="72" width="110" height="34" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="850" y="94">사용자 답변</text>
+
+        <line x1="850" y1="106" x2="850" y2="124" stroke="#5c6472" marker-end="url(#arr)"/>
+        <rect x="795" y="124" width="110" height="34" rx="4" fill="#fff9c4" stroke="#5c6472"/>
+        <text x="850" y="146">답변 반영</text>
+
+        <path d="M 795 141 Q 675 180 583 148" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+        <text x="675" y="170" font-size="11" fill="#2f6fed">→ 해당 Tool (#1·#2·#3)</text>
+
+        <!-- Tool Node #3 (미리보기 이후 수정 · 3단) -->
+        <rect x="835" y="580" width="120" height="100" rx="4" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="895" y="598" font-size="10" font-weight="700" fill="#7b1fa2">Tool Node #3</text>
+        <rect x="843" y="606" width="104" height="22" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="895" y="621" font-size="9">수정 해석</text>
+        <rect x="843" y="632" width="104" height="22" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="895" y="647" font-size="9">품목 확인</text>
+        <rect x="843" y="658" width="104" height="22" rx="3" fill="#fff9c4" stroke="#5c6472"/>
+        <text x="895" y="673" font-size="9">→ Tool #2</text>
+        <rect x="835" y="688" width="120" height="52" rx="4" fill="#f3e5f5" stroke="#5c6472" stroke-dasharray="4 3"/>
+        <text x="895" y="706" font-size="9">※ 미리보기 이후</text>
+        <text x="895" y="720" font-size="9">기존 품목 수정</text>
+        <text x="895" y="734" font-size="9" fill="#5c6472">추가와 구분 · → #2</text>
+
+        <!-- Tool Node #3 출력: 반영 → #2 재검사 → 미리보기 직접 갱신 (품목 추가 흐름과 동일 패턴, 상단 Tool#2 박스 재진입 아님) -->
+        <path d="M 843 669 L 605 669 L 605 312 L 575 312" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr-b)"/>
+        <text x="720" y="662" font-size="10" fill="#2f6fed">수정 반영(#2 재검사) → 갱신</text>
+      </g>
+    </svg>
+
+    <p class="note">
+      <strong>OCR StateGraph:</strong> PDF <code>workflow.py</code> 와 별도 · LLM → Tool #1/#2/#3.<br>
+      <strong>이미지:</strong> Vision → LLM → Tool #1 → Tool #2 루프 → 전체 확정 → 미리보기.<br>
+      <strong>미리보기 이후:</strong> LLM → Tool #1·#2(추가) / Tool #3(수정).
+    </p>
+
+    <h2>Tool 역할</h2>
+    <table class="ex-table" style="margin-bottom:1.5rem">
+      <thead><tr><th style="width:18%">Tool</th><th>역할</th></tr></thead>
+      <tbody>
+        <tr><td><strong>LLM</strong></td><td>라우터 — chitchat / data / edit / amount_only · 다음 Tool 선택 (PDF 그래프와 별도 · fill은 라우터가 아니라 pending_kind로 결정)</td></tr>
+        <tr><td><strong>#1</strong></td><td>원문·채팅 → 품목/수량/단가 구조화 · 확정/미확정 분리</td></tr>
+        <tr><td><strong>#2</strong></td><td>완결·검산·되물음 · 전체 확정 판정</td></tr>
+        <tr><td><strong>#3</strong></td><td>자연어 수정 · 품목 불명 되물음 → #2</td></tr>
+      </tbody>
+    </table>
+
+    <h2>텍스트 첫 입력</h2>
+    <p class="lede" style="margin-bottom:0.75rem">OCR StateGraph 동일 · LLM → Tool #1 → Tool #2 루프 · ＋추가/완료</p>
+    <svg viewBox="0 0 960 970" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OCR 텍스트 첫 입력 LLM Tool">
+      <defs>
+        <marker id="arr2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5c6472"/>
+        </marker>
+        <marker id="arr2-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#2f6fed"/>
+        </marker>
+        <marker id="arr2-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#c62828"/>
+        </marker>
+      </defs>
+      <g font-family="Noto Sans KR, sans-serif" font-size="13" text-anchor="middle">
+
+        <!-- ===== 메인 열 center=240 ===== -->
+        <ellipse cx="240" cy="32" rx="70" ry="20" fill="#e1f5ff" stroke="#5c6472"/>
+        <text x="240" y="37">채팅창 열림</text>
+
+        <line x1="240" y1="52" x2="240" y2="66" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="66" width="160" height="34" rx="4" fill="#fff9c4" stroke="#5c6472"/>
+        <text x="240" y="88">OCR 탭</text>
+
+        <line x1="240" y1="100" x2="240" y2="114" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="114" width="160" height="34" rx="4" fill="#fff9c4" stroke="#5c6472" stroke-dasharray="6 4"/>
+        <text x="240" y="136" font-size="12">OCR 세션 생성</text>
+
+        <line x1="240" y1="148" x2="240" y2="162" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="162" width="160" height="34" rx="4" fill="#e3f2fd" stroke="#5c6472"/>
+        <text x="240" y="184" font-size="12">텍스트 입력</text>
+
+        <line x1="240" y1="196" x2="240" y2="210" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <polygon points="240,210 295,236 240,262 185,236" fill="#fff" stroke="#5c6472" stroke-width="1.5"/>
+        <text x="240" y="232" font-size="11">OCR 세션</text>
+        <text x="240" y="246" font-size="11">비었는지 체크</text>
+
+        <!-- 아니오 → 초기화 → 예 합류 -->
+        <text x="155" y="228" font-size="10" fill="#c62828">아니오</text>
+        <line x1="185" y1="236" x2="115" y2="236" stroke="#c62828" marker-end="url(#arr2-r)"/>
+        <rect x="20" y="218" width="95" height="36" rx="4" fill="#fff9c4" stroke="#5c6472"/>
+        <text x="67" y="233" font-size="11">OCR 세션</text>
+        <text x="67" y="247" font-size="11">초기화</text>
+        <path d="M 67 254 L 67 280 L 240 280" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr2-b)"/>
+        <text x="130" y="274" font-size="10" fill="#2f6fed">예와 합류</text>
+
+        <text x="305" y="250" font-size="10" fill="#2e7d32">예</text>
+        <line x1="240" y1="262" x2="240" y2="290" stroke="#5c6472" marker-end="url(#arr2)"/>
+
+        <polygon points="240,290 290,316 240,342 190,316" fill="#fff" stroke="#5c6472" stroke-width="1.5"/>
+        <text x="240" y="312" font-size="12">LLM (라우터)</text>
+        <text x="240" y="326" font-size="10" fill="#5c6472">의도·Tool 선택</text>
+
+        <!-- 인사 / 일반 대화 -->
+        <text x="340" y="308" font-size="10" fill="#5c6472">인사·일반</text>
+        <line x1="290" y1="316" x2="380" y2="316" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="380" y="292" width="150" height="48" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="455" y="312" font-size="12">안내만</text>
+        <text x="455" y="328" font-size="10" fill="#5c6472">품목·수량·단가 또는 사진</text>
+        <!-- 위쪽(텍스트 입력)으로만 연결 -->
+        <path d="M 455 292 L 455 179 L 320 179" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr2-b)"/>
+
+        <!-- 품목 데이터 -->
+        <text x="200" y="356" font-size="10" fill="#2e7d32">품목 데이터</text>
+        <line x1="240" y1="342" x2="240" y2="372" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="372" width="160" height="40" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="388" font-size="12">원본 텍스트만</text>
+        <text x="240" y="404" font-size="10" fill="#5c6472">원본 이미지 없음</text>
+
+        <line x1="240" y1="412" x2="240" y2="428" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="428" width="160" height="40" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="444" font-size="12">backend_python</text>
+        <text x="240" y="460" font-size="12">/ocr/turn 중계</text>
+
+        <line x1="240" y1="468" x2="240" y2="484" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <!-- OCR StateGraph: Tool #1·#2 포함 -->
+        <rect x="140" y="484" width="200" height="336" rx="6" fill="none" stroke="#9c27b0" stroke-dasharray="5 3"/>
+        <text x="240" y="498" font-size="10" fill="#9c27b0">OCR StateGraph</text>
+
+        <rect x="160" y="506" width="160" height="28" rx="4" fill="#e1bee7" stroke="#5c6472"/>
+        <text x="240" y="524" font-size="11">/ocr/turn</text>
+
+        <line x1="240" y1="534" x2="240" y2="546" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="546" width="160" height="26" rx="4" fill="#e1bee7" stroke="#5c6472"/>
+        <text x="240" y="562" font-size="11">LLM (라우터)</text>
+
+        <line x1="240" y1="572" x2="240" y2="584" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="152" y="584" width="176" height="88" rx="4" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="240" y="600" font-size="11" font-weight="700" fill="#7b1fa2">Tool Node #1</text>
+        <rect x="162" y="608" width="156" height="22" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="623" font-size="10">채팅→품목 추출</text>
+        <rect x="162" y="634" width="156" height="22" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="649" font-size="10">확정/미확정 분리</text>
+
+        <line x1="240" y1="672" x2="240" y2="684" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="152" y="684" width="176" height="120" rx="4" fill="#faf5ff" stroke="#7b1fa2" stroke-width="1.5"/>
+        <text x="240" y="700" font-size="11" font-weight="700" fill="#7b1fa2">Tool Node #2</text>
+        <rect x="162" y="712" width="156" height="22" rx="3" fill="#fff" stroke="#5c6472"/>
+        <text x="240" y="727" font-size="10">필수값·검산</text>
+        <rect x="162" y="740" width="156" height="22" rx="3" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="240" y="755" font-size="10">되물음 생성</text>
+        <rect x="162" y="768" width="156" height="22" rx="3" fill="#c8e6c9" stroke="#5c6472"/>
+        <text x="240" y="783" font-size="10">전체 확정 판정</text>
+
+        <!-- 미완 루프 -->
+        <text x="355" y="750" font-size="11" fill="#c62828">미완</text>
+        <line x1="328" y1="751" x2="400" y2="751" stroke="#c62828" marker-end="url(#arr2-r)"/>
+        <rect x="400" y="734" width="120" height="34" rx="4" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="460" y="756" font-size="12">채팅 되물음</text>
+        <line x1="520" y1="751" x2="560" y2="751" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="560" y="734" width="110" height="34" rx="4" fill="#fff" stroke="#5c6472"/>
+        <text x="615" y="756" font-size="12">답변 반영</text>
+        <!-- 답변 반영 → 종류별 Tool 재진입 (위쪽 돌아서 오른쪽 변으로) -->
+        <path d="M 615 734 L 615 700 L 328 700" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr2-b)"/>
+        <text x="470" y="692" font-size="10" fill="#2f6fed">← 해당 Tool (#1·#2·#3)</text>
+
+        <!-- 한 품목 완료 → +추가 / 완료 -->
+        <text x="300" y="815" font-size="10" fill="#2e7d32">한 품목 완료</text>
+        <line x1="240" y1="804" x2="240" y2="840" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="840" width="160" height="40" rx="4" fill="#ffccbc" stroke="#5c6472"/>
+        <text x="240" y="864" font-size="13">＋추가 / 완료 선택</text>
+
+        <!-- +추가 → 텍스트 입력 (오른쪽 바깥 통로 · 미완 루프와 분리) -->
+        <text x="340" y="856" font-size="10" fill="#2f6fed">＋추가</text>
+        <path d="M 320 860 L 800 860 L 800 179 L 320 179" fill="none" stroke="#2f6fed" stroke-width="1.5" marker-end="url(#arr2-b)"/>
+        <text x="820" y="420" font-size="10" fill="#2f6fed">다음 품목</text>
+
+        <!-- 완료 → 미리보기 합류 -->
+        <text x="200" y="908" font-size="10" fill="#2e7d32">완료</text>
+        <line x1="240" y1="880" x2="240" y2="912" stroke="#5c6472" marker-end="url(#arr2)"/>
+        <rect x="160" y="912" width="160" height="40" rx="4" fill="#c8e6c9" stroke="#5c6472"/>
+        <text x="240" y="936" font-size="12">완료된 전체 내용</text>
+
+        <!-- 메모: 이후 동일 (완료된 전체 내용과 같은 높이) -->
+        <rect x="380" y="912" width="280" height="40" rx="6" fill="#fff8e1" stroke="#f9a825" stroke-dasharray="6 4"/>
+        <text x="520" y="928" font-size="11" fill="#242a35">※ 이후 이미지 메인과 동일</text>
+        <text x="520" y="942" font-size="10" fill="#242a35">문서종류 선택 → 미리보기 → 저장·다운로드</text>
+        <line x1="380" y1="932" x2="320" y2="932" stroke="#5c6472" marker-end="url(#arr2)"/>
+      </g>
+    </svg>
+    <p class="note">
+      예: 「커피」→ LLM → Tool Node #1 → Tool Node #2 되물음 → ＋추가/완료.
+    </p>
+
+    <h2>부가 흐름</h2>
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th style="width:22%">항목</th>
+          <th>동작</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>여러 장 업로드</strong></td>
+          <td>가능. 영수증은 <strong>1건</strong>. 품목 목록 합침. 같은 품명: 한쪽만 채움→채택 / 둘 다 비움→미확정 / 값 다름→되물음.</td>
+        </tr>
+        <tr>
+          <td><strong>텍스트 첫 입력</strong></td>
+          <td>세션 체크 → LLM → Tool #1·#2. ＋추가/완료.</td>
+        </tr>
+        <tr>
+          <td><strong>미리보기 이후</strong></td>
+          <td>LLM → Tool #1·#2(추가) / Tool #3(수정).</td>
+        </tr>
+        <tr>
+          <td><strong>금액 검산 불일치</strong></td>
+          <td>Tool #2 되물음.</td>
+        </tr>
+        <tr>
+          <td><strong>저장본 불러오기</strong></td>
+          <td>데이터만 로드 → 품목 목록 복원 → 문서종류 선택 후 미리보기 가능.</td>
+        </tr>
+        <tr>
+          <td><strong>보내기</strong></td>
+          <td>보류. 버튼만 비활성.</td>
+        </tr>
+        <tr>
+          <td><strong>문서종류 MVP</strong></td>
+          <td>영수증만 활성. 견적·거래명세·청구는 준비중(설정에서 읽음).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>예외 상황</h2>
+    <p class="lede" style="margin-bottom:0.75rem">오류가 아니면 OCR 세션이 깨지기 <strong>전에</strong> 제어. 이미지 오류는 안내 모달 후 <strong>OCR 세션 생성</strong>.</p>
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th style="width:22%">경우</th>
+          <th style="width:28%">언제</th>
+          <th>처리</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>이미지 오류</strong></td>
+          <td>Vision 실패 · 글자 없음 등</td>
+          <td><strong>안내 모달</strong> → 클리어 → <strong>OCR 세션 생성 (신규 초기화)</strong></td>
+        </tr>
+        <tr>
+          <td><strong>비이미지 업로드</strong></td>
+          <td>엑셀 등</td>
+          <td>「이미지만 지원합니다」. 세션 유지</td>
+        </tr>
+        <tr>
+          <td><strong>못 읽음 · 필드 없음</strong></td>
+          <td>성공 경로·글자만 있고 품목 필드 아님</td>
+          <td>안내. 문서종류 비활성. 세션 유지</td>
+        </tr>
+        <tr>
+          <td><strong>금액 검산 불일치</strong></td>
+          <td>Tool #2</td>
+          <td>채팅 되물음. 확정 금액 = 계산값</td>
+        </tr>
+        <tr>
+          <td><strong>+ 새 작업</strong> (미저장)</td>
+          <td>버튼</td>
+          <td>확인 후 클리어 → OCR 세션 생성</td>
+        </tr>
+        <tr>
+          <td><strong>탭 나가기</strong></td>
+          <td>미저장 작업 중</td>
+          <td>깨지기 전 확인 모달 후 클리어
+            <span class="badge badge-check">확인필요</span> — 설계엔 있으나 2026-08-28 실사용 중 다른 탭(FAQ/PDF) 이동 시 모달 없이 바로 이동하는 게 관찰됨. <a href="#impl-open">7항목</a> 참고.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>서버 오류</strong> (기타)</td>
+          <td>—</td>
+          <td>일반 서버 오류 처리</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="impl-summary">2부 — 구현 현황 (2026-08-28 기준)</h2>
+    <p class="lede">아래는 1부 설계를 실제 코드로 옮기면서 나온 버그 수정·신규 결정·설계 초안을 시간순으로 정리한 것입니다. 원본 근거: <code class="inline">Docs/20260827_OCR_그래프_이관_gap분석.md</code>, <code class="inline">Docs/20260827_OCR_LLM_Tool_이미지_작업사항_수정본_2차.md</code>.</p>
+
+    <h3>1. 그래프 마이그레이션 <span class="badge badge-done">완료</span></h3>
+    <p class="lede" style="margin-bottom:0.6rem">
+      기존 <code class="inline">OcrTurnService</code>/<code class="inline">turn.py</code> 로직을 <code class="inline">app/graph/ocr/*</code> LangGraph <code class="inline">StateGraph</code>로 이관. 노드 4개(<code class="inline">llm_router_node</code>/<code class="inline">tool_1_node</code>/<code class="inline">tool_2_node</code>/<code class="inline">tool_3_node</code>) 전부 구현·테스트 완료. <code class="inline">/ocr/turn</code>에 <code class="inline">OCR_USE_GRAPH</code> 환경변수 스위치로 연결 — 레거시 경로는 그대로 두고 그래프 경로를 선택적으로 켤 수 있게 함.
+    </p>
+    <table class="ex-table">
+      <thead><tr><th style="width:30%">실사용 테스트로 찾은 버그</th><th>원인 · 수정</th></tr></thead>
+      <tbody>
+        <tr><td>첫 전체 확정 시 <code class="inline">reply</code> 빈 문자열</td><td><code class="inline">tool_2_node</code>의 <code class="inline">all_confirmed</code> 분기가 <code class="inline">reply</code> 미설정 → <code class="inline">KIND_NOT_SELECTED_REPLY</code> 설정 + 어댑터가 <code class="inline">kind_id</code> 여부로 문구 교체</td></tr>
+        <tr><td><code class="inline">raw_text</code> 미누적</td><td>그래프 경로에서 누적 로직 누락 → <code class="inline">intent=="data"</code>일 때만 누적하도록 추가(레거시 타이밍과 동일하게)</td></tr>
+        <tr><td>이미지 업로드가 통째로 무시됨</td><td><code class="inline">llm_router_node</code>가 <code class="inline">user_message</code>만 보고 <code class="inline">raw_text</code>(이미지 텍스트)는 안 봄 → <code class="inline">cleaned = user_message or raw_text</code> 폴백 추가. 전용 테스트로 사전 발견(사용자 수동 테스트 전)</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="impl-routing">2. 라우팅·되물음 버그 수정 3건 <span class="badge badge-done">완료</span></h3>
+
+    <h4 style="font-size:0.85rem;margin:1rem 0 0.4rem">2-1. 인사 아닌 chitchat도 품목 후보로</h4>
+    <p class="lede" style="margin-bottom:0.5rem">
+      설계(6-2/6-2a) 기준: 인사만 안내만 응답, 나머지는 전부 품목/수정 판별로. 실제론 <code class="inline">classify_intent</code>의 <code class="inline">chitchat</code> 결과 하나에 진짜 인사와 파싱 실패 텍스트가 섞여 있어서, <code class="inline">"율무차 추가"</code>(품목명+동사, 수량·단가 없음)가 안내만 문구로 떨어짐. 수정: <code class="inline">llm_router_node</code>에서 인사 여부(<code class="inline">is_greeting</code>)만으로 분기 — 인사면 안내만, 그 외는 전부 <code class="inline">unclear</code> 되물음(기존 경로 재사용). 특정 동사 키워드 나열 방식은 쓰지 않음(규칙 증식 방지). 첫 턴(<code class="inline">has_lines=False</code>)·미리보기 이후(<code class="inline">has_lines=True</code>) 양쪽 다 적용, 레거시 <code class="inline">turn.py</code>는 이 변경과 무관(별도 후처리 로직이라 미영향).
+    </p>
+
+    <h4 style="font-size:0.85rem;margin:1rem 0 0.4rem">2-2. pending_kind 되물음 중 무관한 요청 인터럽트 처리</h4>
+    <p class="lede" style="margin-bottom:0.5rem">
+      되물음 대기 중(<code class="inline">pending_kind</code> 설정됨)이면 <code class="inline">_route_entry</code>가 라우터를 건너뛰고 해당 tool로 직행 — 그래서 무관한 새 요청이 오면 tool이 답으로 해석 실패, 같은 질문만 반복(재현: <code class="inline">conflict</code> 되물음 중 "율무차 추가" → 무한 반복). 정책: 계산 가능한 결과값이 있으면(<code class="inline">conflict</code>/<code class="inline">field_conflict</code>) 그 값으로 확정 안내 후 새 메시지를 라우터로 전달, 없으면(<code class="inline">fill_name</code>/<code class="inline">unclear</code>/<code class="inline">name_confirm</code>/<code class="inline">ask_item</code>/<code class="inline">add_confirm</code>) 새 메시지 무시하고 같은 품목 질문 유지. <code class="inline">add_confirm</code>은 "동의 여부"라 계산값이 아니므로 후자로 분류.
+    </p>
+
+    <h4 style="font-size:0.85rem;margin:1rem 0 0.4rem">2-3. field_conflict 인터럽트 기본값 — 보수적 선택</h4>
+    <p class="lede" style="margin-bottom:0.6rem">
+      <code class="inline">field_conflict</code>는 같은 품목명이 확정 목록과 새 입력 양쪽에 있는데 수량/단가가 다를 때 발생(<code class="inline">options[0]</code>=기존 확정값, <code class="inline">options[1]</code>=신규 입력, 항상 2개). 인터럽트 시 처음엔 <code class="inline">options[-1]</code>(신규값)을 기본값으로 썼는데, 신규 입력이 검증 전 값(오독 가능성 있음)이라 무응답 상황에 조용히 확정하기엔 위험 판단 → <code class="inline">options[0]</code>(기존 확정값 유지)으로 변경.
+    </p>
+    <table class="ex-table">
+      <thead><tr><th>테스트 결과</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">tests/test_graph_ocr_nodes.py</code> + <code class="inline">test_ocr_receipt.py</code> + <code class="inline">test_ocr_turn.py</code> + <code class="inline">test_ocr_api.py</code> → 101 passed, 회귀 없음</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="impl-qty">3. 수량 파싱 · 결측 대칭 처리 <span class="badge badge-progress">진행중(방향 확정, 완료 보고 대기)</span></h3>
+    <p class="lede" style="margin-bottom:0.6rem">
+      재현: "율무차" → "2 3000원"(단위 없는 <code class="inline">2</code>가 수량으로 인식 안 됨 → 단가만 3000원 반영, 수량 결측) → "2개 2000원"(완전한 답인데도 <code class="inline">fill_name</code> 재개 로직이 "단가 결측"만 채울 수 있어서 거부, "단가를 확인할 수 없어요"라는 잘못된 문구 반복). 확정 방향:
+    </p>
+    <table class="ex-table">
+      <thead><tr><th style="width:26%">항목</th><th>결정</th></tr></thead>
+      <tbody>
+        <tr><td>단위 없는 앞숫자</td><td>뒤에 단가(원)가 따라오면 수량으로 인식 ("2 3000원" → 수량 2)</td></tr>
+        <tr><td><code class="inline">fillable</code> 판정</td><td><code class="inline">check_completeness</code>가 단가 결측뿐 아니라 수량 결측도 채울 대상으로 인식하도록 대칭 확장</td></tr>
+        <tr><td>되물음 문구</td><td>수량 결측 전용 문구 신설("수량을 확인할 수 없어요. 몇 개인가요?") — 기존 단가 결측 문구를 재사용하지 않음</td></tr>
+        <tr><td>재개 시 값 반영</td><td>완전한 답("2개 2000원")이 오면 결측 필드만 뽑지 않고, 답변에 포함된 값 전부(수량·단가)로 최신값 덮어쓰기 — 이전 턴의 스테일 값(3000원) 무시</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="impl-pdf">4. PDF 다운로드 = 미리보기 일치 <span class="badge badge-done">완료 (Cursor 보고)</span></h3>
+    <p class="lede" style="margin-bottom:0.6rem">
+      기존엔 <code class="inline">reportlab</code> <code class="inline">drawString</code>만 써서 글자만 찍히고 테두리·음영이 전혀 없었음(웹 미리보기와 불일치). <code class="inline">app/ocr/pdf.py</code>를 <code class="inline">reportlab</code> platypus <code class="inline">Table</code>/<code class="inline">TableStyle</code>로 재작성해 웹 미리보기(<code class="inline">frontend_react/src/ocr/OcrTabPanel.jsx</code>의 <code class="inline">OcrReceiptPreview</code>)와 같은 표 스타일로 렌더. 공급받는자용·공급자용 2페이지, 내용 동일.
+    </p>
+
+    <h3 id="impl-autokind">5. 문서종류 자동선택 <span class="badge badge-done">완료 (Cursor 보고)</span></h3>
+    <p class="lede" style="margin-bottom:0.6rem">
+      설계 문서 5-2 "(자동) 영수증 기본선택"은 실제 코드에 로직이 없던 문서-현실 불일치였음(3차 확인). 코드님이 실제로 만들기로 결정 — 활성화된 문서종류가 1개뿐일 때만 자동선택, 그래프 경로 <code class="inline">app/graph/ocr/service.py</code>에 구현.
+    </p>
+
+    <h3 id="impl-db">6. DB 설계 — 공급자정보 · 발급이력 ERD <span class="badge badge-draft">설계만 (CREATE 전)</span></h3>
+    <p class="lede" style="margin-bottom:0.6rem">
+      현재 공급자(사업자) 정보는 <code class="inline">app/ocr/pdf.py</code>의 <code class="inline">_SAMPLE_SUPPLIER</code>에 하드코딩(프론트 <code class="inline">ocrTabConfig.js</code>의 <code class="inline">OCR_SAMPLE_SUPPLIER</code>와 동일값 중복 보관). 기존 MariaDB(admin_backend_python과 공유하는 chatbot DB, <code class="inline">sql/*.sql</code> 컨벤션)에 신규 테이블 2개로 이관 예정. 전체 ERD는 <code class="inline">Docs/20260828_OCR_공급자정보_발급이력_DB_ERD.md</code> 참고.
+    </p>
+    <table class="ex-table">
+      <thead><tr><th style="width:26%">테이블</th><th>핵심 컬럼</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code class="inline">ocr_supplier_info</code><br><span style="color:#5c6472;font-size:0.78rem">공급자정보 · admin_user_id당 1건</span></td>
+          <td><code class="inline">biz_no</code>(사업자등록번호) · <code class="inline">company</code>(상호명) · <code class="inline">owner</code>(대표자) · <code class="inline">address</code>(사업장주소) · <code class="inline">business_type</code>(업태) · <code class="inline">item_category</code>(종목) · <code class="inline">seal_image_url</code>(도장 이미지 URL — 파일은 <code class="inline">data/ocr_seals/</code> 디렉토리에 저장, DB엔 URL만)</td>
+        </tr>
+        <tr>
+          <td><code class="inline">ocr_issued_documents</code><br><span style="color:#5c6472;font-size:0.78rem">발급 문서 이력</span></td>
+          <td><code class="inline">supplier_id_num</code>(FK) · <code class="inline">kind_id</code>(문서종류) · <code class="inline">lines_json</code>(품목 스냅샷) · <code class="inline">total_amount</code> · <code class="inline">issued_at</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">미해결 질문(CREATE 전 확인 필요): ① 공급자정보 admin_user_id당 1건 고정 여부, ② 발급 이력 저장 시점(다운로드/저장하기), ③ 품목을 JSON으로 뭉칠지 별도 테이블로 분리할지. 거래처(공급받는자) 정보 테이블은 이번 범위에서 제외(보류 결정) — 표준 영수증 양식 자체가 공급받는자 상호를 요구하지 않아 급하지 않다고 판단.</p>
+
+    <h3 id="impl-open">7. 보류 · 확인 필요 항목</h3>
+    <table class="ex-table">
+      <thead><tr><th style="width:22%">항목</th><th style="width:14%">상태</th><th>메모</th></tr></thead>
+      <tbody>
+        <tr><td>탭 이탈 경고 모달</td><td><span class="badge badge-check">확인필요</span></td><td>설계(예외 상황 표)엔 있으나, 실사용 중 저장 안 한 상태로 다른 탭(FAQ/PDF) 이동 시 모달 없이 바로 이동하는 게 관찰됨. 프론트(<code class="inline">frontend_react</code>) 쪽 확인·수정 필요 — 백엔드 그래프 작업과 범위가 달라 별도 relay 필요.</td></tr>
+        <tr><td>거래처(공급받는자) 상호 필드</td><td><span class="badge badge-hold">보류</span></td><td>나중에 필요하면 추가하기로 결정. 표준 영수증은 원래 공급받는자 상호를 요구하지 않음(세금계산서 필수 기재사항 중 공급받는자 사업자등록번호·부가세액을 생략한 약식 문서).</td></tr>
+        <tr><td>DEBUG_ONOFF 로그 확장</td><td><span class="badge badge-check">확인필요</span></td><td>노드 호출 흐름(어떤 분기 탔는지, 인터럽트 그룹, 확정값)까지 보이도록 <code class="inline">_trace()</code> 확장 지시문 작성 완료. Cursor relay·구현 여부 미확인.</td></tr>
+        <tr><td><code class="inline">turn.py</code>/<code class="inline">resolve_unclear_answer</code> 중복</td><td><span class="badge badge-hold">보류</span></td><td>레거시·그래프 두 경로가 공존하는 동안은 유지. 레거시 완전 폐기 시점에 정리.</td></tr>
+        <tr><td>체크리스트 1(세션·진입)·공통(DEBUG_ONOFF·화면 이벤트 로그)</td><td><span class="badge badge-check">확인필요</span></td><td>이번 마이그레이션 범위 밖으로 스킵됨 — 별도 검증 필요.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

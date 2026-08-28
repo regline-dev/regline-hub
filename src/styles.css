@@ -658,6 +658,11 @@ body {
   box-shadow: 0 1px 2px rgba(26, 31, 38, 0.15);
 }
 
+/* OCR 카드만 회색 본문을 늘림 (위치 이동 아님) */
+.agentic-thumbnail--ocr {
+  height: 146px;
+}
+
 .agentic-thumbnail__header {
   height: 28px;
   flex-shrink: 0;
@@ -678,11 +683,12 @@ body {
 
 .agentic-thumbnail__mode {
   flex-shrink: 0;
-  padding: 1px 7px;
+  padding: 2px 8px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.22);
-  font-size: 9px;
-  font-weight: 700;
+  background: #fff;
+  color: #1a5fb4;
+  font-size: 10px;
+  font-weight: 800;
   letter-spacing: 0.04em;
   animation: agentic-pdf-blink 1.4s ease-in-out infinite;
 }
@@ -693,7 +699,7 @@ body {
     opacity: 1;
   }
   50% {
-    opacity: 0.25;
+    opacity: 0.72;
   }
 }
 
